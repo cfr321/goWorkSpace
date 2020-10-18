@@ -16,8 +16,7 @@ func (a Int64) Cmp(cmpInterface container.CmpInterface) bool {
 }
 
 func main() {
-	h := &container.Heap{Int64(1),Int64(2),Int64(3)}
+	h := &container.Heap{Int64(1), Int64(2), Int64(3)}
 	heap.Init(h)
-	heap.Push(h,Int64(1))
-
+	heap.Push(h, Int64(1))
 }
