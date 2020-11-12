@@ -9,6 +9,9 @@ import (
 	"fmt"
 )
 
+type cmp struct {
+
+}
 type CmpInterface interface {
 	Cmp(cmpInterface CmpInterface) bool
 }
