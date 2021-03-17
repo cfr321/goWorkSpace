@@ -4,7 +4,9 @@
 
 package main
 
-import "math/rand"
+import (
+	"math/rand"
+)
 
 type RandomizedCollection struct {
 	m    map[int][]int
@@ -49,6 +51,14 @@ func (this *RandomizedCollection) Remove(val int) bool {
 	this.nums = this.nums[:n-1]
 	return true
 }
+
+//func equalSubstring(s string, t string, maxCost int) int {
+//	rem:= make([]int, len(s))
+//
+//	for i := 0; i < len(s); i++ {
+//
+//	}
+//}
 
 /** Get a random element from the collection. */
 func (this *RandomizedCollection) GetRandom() int {

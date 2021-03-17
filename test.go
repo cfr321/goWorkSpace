@@ -1,12 +1,11 @@
-//
-// Author: cfr
-//
-
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
 func main() {
-	a:="asf"
-	fmt.Print(a[:1])
+	res :=  strconv.FormatInt(5, 2)
+	fmt.Print(fmt.Sprintf("%032s",res))
 }
