@@ -2,34 +2,43 @@
 // Author: cfr
 //
 package main
+
+import "fmt"
+
 type ListNode struct {
-	Val int
-    Next *ListNode
+	Val  int
+	Next *ListNode
 }
 
 func rotateRight(head *ListNode, k int) *ListNode {
-	var res,last *ListNode
-	res=head
-	l:=0
-	for res!=nil {
-		l++
-		last=res
-		res=res.Next
+	p := head
+	len := 1
+	for p.Next != nil {
+		len++
+		p = p.Next
 	}
-	if l == 1 || l == 0 {
+	if len == 0 && len == 1 {
 		return head
 	}
-	k%=l
-	k=l-k
-	if k == 0 {
-		return head
+
+	k %= len
+	k = len - k
+	res := head
+	for k > 1 {
+		res = res.Next
+		k--
 	}
-	res=head
-	for i := 0; i < k-1; i++ {
-		res=res.Next
-	}
-	last.Next=head
-	head=res.Next
-	res.Next=nil
+	p.Next = head
+	head = res.Next
+	res.Next = nil
 	return head
+}
+func addSlice(arr *[]int) {
+	*arr = append(*arr, 1)
+}
+func main() {
+
+	ints := make([]int, 10)
+	addSlice(&ints)
+	fmt.Print(ints)
 }

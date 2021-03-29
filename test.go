@@ -2,10 +2,17 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 )
 
+type test struct {
+	a int
+}
+
+func (t *test) testPrit() {
+	t.a = 34
+}
 func main() {
-	res :=  strconv.FormatInt(5, 2)
-	fmt.Print(fmt.Sprintf("%032s",res))
+	a := test{55}
+	a.testPrit()
+	fmt.Print(a.a)
 }

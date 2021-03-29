@@ -5,7 +5,6 @@
 package main
 
 import (
-	"fmt"
 	"sort"
 )
 
@@ -82,8 +81,8 @@ func diffecent(word string, s string) int {
 }
 
 type bitarr struct {
-	a  []int
-	n  []int
+	a []int
+	n []int
 }
 
 func (b bitarr) Len() int {
@@ -91,22 +90,22 @@ func (b bitarr) Len() int {
 }
 
 func (b bitarr) Less(i, j int) bool {
-	if b.n[i] == b.n[j]{
-		return b.a[i]<b.a[j]
+	if b.n[i] == b.n[j] {
+		return b.a[i] < b.a[j]
 	}
 	return b.n[i] < b.n[j]
 }
 
 func (b bitarr) Swap(i, j int) {
-	b.a[i],b.a[j] = b.a[j],b.a[i]
-	b.n[i],b.n[j] = b.n[j],b.n[i]
+	b.a[i], b.a[j] = b.a[j], b.a[i]
+	b.n[i], b.n[j] = b.n[j], b.n[i]
 }
 
 func numBit(a int) int {
-	i:=0
+	i := 0
 	for a != 0 {
 		i++
-		a &= a-1
+		a &= a - 1
 	}
 	return i
 }
@@ -120,7 +119,31 @@ func sortByBits(arr []int) []int {
 	return bitArr.a
 }
 
-func main() {
-	fmt.Println(numBit(6978))
-	fmt.Println(numBit(8641))
+type BSTIterator struct {
+	root *TreeNode
+	s    []*TreeNode
+}
+
+func Constructor1(root *TreeNode) BSTIterator {
+	var b BSTIterator
+	b.root = root
+	return b
+}
+
+func (this *BSTIterator) Next() int {
+	if this.HasNext() {
+		for this.root != nil {
+			this.s = append(this.s, this.root)
+			this.root = this.root.Left
+		}
+		this.root = this.s[len(this.s)-1]
+		this.s = this.s[:len(this.s)-1]
+		res = this.root.Val
+		this.root = this.root.Right
+	}
+	return -1
+}
+
+func (this *BSTIterator) HasNext() bool {
+	return this.root != nil || len(this.s) != 0
 }
