@@ -5,7 +5,11 @@
 package main
 
 import (
+	"flag"
+	"math/bits"
+	"os"
 	"sort"
+	"time"
 )
 
 func wordBreak(s string, wordDict []string) []string {
@@ -144,6 +148,37 @@ func (this *BSTIterator) Next() int {
 	return -1
 }
 
+func reverseBits(num uint32) uint32 {
+Tab:
+	now := time.Now()
+	print(now)
+	goto Tab
+	return bits.Reverse32(num)
+}
+
 func (this *BSTIterator) HasNext() bool {
 	return this.root != nil || len(this.s) != 0
+}
+
+var NewLine = flag.Bool("n", false, "print newline") // echo -n flag, of type *bool
+
+const (
+	Space   = " "
+	Newline = "\n"
+)
+
+func main() {
+	flag.PrintDefaults()
+	flag.Parse() // Scans the arg list and sets up flags
+	var s string = ""
+	for i := 0; i < flag.NArg(); i++ {
+		if i > 0 {
+			s += " "
+			if *NewLine { // -n is parsed, flag becomes true
+				s += Newline
+			}
+		}
+		s += flag.Arg(i)
+	}
+	os.Stdout.WriteString(s)
 }
