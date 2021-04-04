@@ -4,34 +4,35 @@
 
 package myUtil
 
-type intHeap struct {
-	items []int
-	L     bool
+type CmpInterface interface {
+	Less(other CmpInterface) bool
 }
-func (h intHeap) Len() int {
+type priorityQueue struct {
+	items []CmpInterface
+}
+
+func (h *priorityQueue) Len() int {
 	return len(h.items)
 }
-func (h intHeap) Less(i, j int) bool {
-	if h.L {
-		return h.items[i] < h.items[j]
-	} else {
-		return h.items[i] > h.items[j]
-	}
+func (h *priorityQueue) Less(i, j int) bool {
+	return h.items[i].Less(h.items[j])
 }
-func (h intHeap) Swap(i, j int) {
+func (h *priorityQueue) Swap(i, j int) {
 	h.items[i], h.items[j] = h.items[j], h.items[i]
 }
-func (h *intHeap) Push(x interface{}) {
-	h.items = append(h.items, x.(int))
+func (h *priorityQueue) Push(x interface{}) {
+	h.items = append(h.items, x.(CmpInterface))
 }
-func (h *intHeap) Pop() interface{} {
+func (h *priorityQueue) Pop() interface{} {
+	if len(h.items) == 0 {
+		return nil
+	}
 	res := h.items[len(h.items)-1]
 	h.items = append(h.items[:len(h.items)-1])
 	return res
 }
-func NewIntHeap(Less bool) *intHeap {
-	return &intHeap{
-		items: []int{},
-		L:     Less,
+func NewHeap() *priorityQueue {
+	return &priorityQueue{
+		items: []CmpInterface{},
 	}
 }

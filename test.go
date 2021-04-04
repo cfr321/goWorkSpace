@@ -1,10 +1,10 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"math"
-	"strings"
+	"net/http"
+	"workspace/myUtil"
 )
 
 type Address struct {
@@ -63,24 +63,33 @@ func trap1(height []int) int {
 	return res
 }
 
-func main() {
-	pa := &Address{"private", "Aartselaar", "Belgium"}
-	wa := &Address{"work", "Boom", "Belgium"}
-	vc := VCard{"Jan", "Kersschot", []*Address{pa, wa}, "none"}
-	// fmt.Printf("%v: \n", vc) // {Jan Kersschot [0x126d2b80 0x126d2be0] none}:
-	// JSON format:
-	js, _ := json.Marshal(vc)
+type Node struct {
+	a, b int
+}
 
-	//
-	//var new VCard
-	//json.Unmarshal(js,&new)
-	//fmt.Println(*new.Addresses[1])
-	//fmt.Println(*vc.Addresses[1])
-	s := "eyJGaXJzdE5hbWUiOiJKYW4iLCJMYXN0TmFtZSI6IktlcnNzY2hvdCIsIkFkZHJlc3NlcyI6W3siVHlwZSI6InByaXZhdGUiLCJDaXR5IjoiQWFydHNlbGFhciIsIkNvdW50cnkiOiJCZWxnaXVtIn0seyJUeXBlIjoid29yayIsIkNpdHkiOiJCb29tIiwiQ291bnRyeSI6IkJlbGdpdW0ifV0sIlJlbWFyayI6Im5vbmUifQ=="
-	//encoder := json.NewEncoder(os.Stdout)
-	//encoder.Encode(js)
-	//io.Reader()
-	decoder := json.NewDecoder(strings.NewReader(s))
-	decoder.Decode(js)
-	fmt.Print(string(js))
+func (n Node) Less(other myUtil.CmpInterface) bool {
+	return n.b < other.(Node).b
+}
+
+type easy struct {
+	Name string `json:"name"` // 字段解释，可指json 字符串的名字
+	Age  int    `json: age`
+	Like string `json: like`
+}
+
+func handle(writer http.ResponseWriter, request *http.Request) {
+	data := []byte("helloNihao")
+	writer.Write(data)
+}
+
+func handle2(writer http.ResponseWriter, request *http.Request) {
+	data := []byte("草拟吗")
+	writer.Write(data)
+}
+
+func main() {
+	http.HandleFunc("/go", handle)
+	http.HandleFunc("/hello", handle2)
+	fmt.Print("run app")
+	http.ListenAndServe(":1234", nil)
 }

@@ -10,7 +10,6 @@ import (
 )
 
 type cmp struct {
-
 }
 type CmpInterface interface {
 	Cmp(cmpInterface CmpInterface) bool
@@ -18,9 +17,11 @@ type CmpInterface interface {
 
 // IntHeap是一个整型的整数。
 type Heap []CmpInterface
+
 var one *Heap
+
 func (h Heap) Len() int           { return len(h) }
-func (h Heap) Less(i, j int) bool { return h[i].Cmp(h[j])}
+func (h Heap) Less(i, j int) bool { return h[i].Cmp(h[j]) }
 func (h Heap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
 
 func (h *Heap) Push(x interface{}) {
@@ -42,7 +43,6 @@ func NewHeap() *Heap {
 	return one
 }
 
-
 //使用实例
 type Int int
 
@@ -50,11 +50,11 @@ func (a Int) Cmp(b CmpInterface) bool {
 	return int(a) < int(b.(Int))
 }
 func main() {
-	var b Heap
-	heap.Init(&b)
-	heap.Push(&b,Int(1))
-	heap.Push(&b,Int(2))
-	heap.Push(&b,Int(8))
-	heap.Push(&b,Int(5))
-	fmt.Print(heap.Pop(&b))
+	var b *Heap
+	heap.Init(b)
+	heap.Push(b, Int(1))
+	heap.Push(b, Int(2))
+	heap.Push(b, Int(8))
+	heap.Push(b, Int(5))
+	fmt.Print(heap.Pop(b))
 }
