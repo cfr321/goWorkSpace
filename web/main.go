@@ -10,6 +10,7 @@ import (
 // gin的helloWorld
 
 func main() {
+
 	// 1.创建路由
 	// 默认使用了2个中间件Logger(), Recovery()
 	r := gin.Default()
@@ -32,6 +33,7 @@ func main() {
 				return
 			}
 		}
+
 		c.String(200, fmt.Sprintf("upload ok %d files", len(files)))
 		c.FileAttachment("./data/data.csv", "data.csv")
 	})

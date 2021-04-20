@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"math"
 	"net/http"
@@ -87,9 +88,23 @@ func handle2(writer http.ResponseWriter, request *http.Request) {
 	writer.Write(data)
 }
 
+type student struct {
+	name string
+	size int
+	sex  string
+}
+
+func (s student) String() string {
+	return s.name + "    [][]   " + s.sex + "caonima"
+}
+
 func main() {
-	http.HandleFunc("/go", handle)
-	http.HandleFunc("/hello", handle2)
-	fmt.Print("run app")
-	http.ListenAndServe(":1234", nil)
+	s := "sha256 芳华"
+
+	//h := sha256.New()
+	//h.Write([]byte(s))
+	//bs := h.Sum(nil)
+
+	bytes := sha256.Sum256([]byte(s))
+	fmt.Printf("origin: %s, sha256 hash: %x\n", s, bytes)
 }
