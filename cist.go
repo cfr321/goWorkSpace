@@ -5,9 +5,8 @@
 package main
 
 import (
-
 	"fmt"
-	Cist "workspace/cist-gbc3/cist"
+	"workspace/cist-gbc3"
 )
 
 func main() {
@@ -15,5 +14,5 @@ func main() {
 	var n int
 	fmt.Println("请输入n:")
 	fmt.Scan(&n)
-	Cist.Test(n)
+	cist.Test(n)
 }

@@ -2,7 +2,7 @@
 // Author: cfr
 //
 
-package Cist
+package cist
 
 import (
 	"fmt"
@@ -282,24 +282,25 @@ func INode_CISTs(Vis InnerNodeArraysInOneBCubeN1, W []bool) []edgeArray {
 		Vik := Vis.innerNodes[k] //点集合
 		var Eik edgeArray
 		Eik = connectInerNodes(Vik) // 在 Bcube(n,1)里将内节点链接起来
+
 		Eits[k] = append(Eits[k], Eik...)
 	}
 
 	// 完成 sigma 那颗树的生成
-	if i < t {
-		EiOfSigma := FPath(sigma, Vis)
-		Eits[sigma] = append(Eits[sigma], EiOfSigma...) //把这些点也加到对应的生成树里面
-	} else {
-		EiOfSigma := LPath(sigma, Vis)
-		Eits[sigma] = append(Eits[sigma], EiOfSigma...) //把这些点也加到对应的生成树里面
-	}
-
-	path := VPath(sigma, Vis)
-	for i := 0; i < t; i++ {
-		if i != sigma {
-			Eits[i] = append(Eits[i], path[i]...)
-		}
-	}
+	//if i < t {
+	//	EiOfSigma := FPath(sigma, Vis)
+	//	Eits[sigma] = append(Eits[sigma], EiOfSigma...) //把这些点也加到对应的生成树里面
+	//} else {
+	//	EiOfSigma := LPath(sigma, Vis)
+	//	Eits[sigma] = append(Eits[sigma], EiOfSigma...) //把这些点也加到对应的生成树里面
+	//}
+	//
+	//path := VPath(sigma, Vis)
+	//for i := 0; i < t; i++ {
+	//	if i != sigma {
+	//		Eits[i] = append(Eits[i], path[i]...)
+	//	}
+	//}
 	return Eits //返回第i课Bcube(n,1)的所有独立生成树边
 }
 
@@ -317,6 +318,11 @@ func connectInerNodes(vik nodeArray) edgeArray {
 		visit[node.j] = false
 	}
 	dfs(vik[0].j, vik[0].h, vik[0].i)
+	for i := 0; i < len(visit); i++ {
+		if !visit[i] {
+			fmt.Printf("dis connect %d  %d\n", vik[0].h, vik[0].i)
+		}
+	}
 	return res
 }
 func dfs(i int, h, t int) {
@@ -351,16 +357,15 @@ func buildBcube(n int) {
 // 节点分入不同的独立生成树
 func distributeNode(Vis *InnerNodeArraysInOneBCubeN1, W []bool, sigma int, n int, h int, i int) {
 	var rk, p, time int
-
-	for k := 0; k < t; k++ {
-		for round := 0; round < 2; round++ {
+	for round := 0; round < 2; round++ {
+		for k := 0; k < t; k++ {
 			if k != sigma {
 				Vik := &Vis.innerNodes[k] //便于操作
 				rk = (*Vik)[0].j
 				if round == 0 {
-					p = 1
-				} else {
 					p = 0
+				} else {
+					p = 1
 					time = 0
 				}
 				var c = -rk / n
@@ -373,9 +378,11 @@ func distributeNode(Vis *InnerNodeArraysInOneBCubeN1, W []bool, sigma int, n int
 						*Vik = append(*Vik, node{h, i, pos})
 						W[pos] = false
 						p++
+						c++
 						time = 0
+					} else {
+						c++
 					}
-					c++
 					if rk+p+c*n >= np || rk+p+c*n < 0 {
 						c = -rk / n
 						time++
@@ -390,6 +397,16 @@ func distributeNode(Vis *InnerNodeArraysInOneBCubeN1, W []bool, sigma int, n int
 		if W[i2] { //代表点还在剩余集合中
 			id := Vis.minLenId() //获取内联点集集合最短的
 			Vis.innerNodes[id] = append(Vis.innerNodes[id], node{h, i, i2})
+		}
+	}
+	if h == 0 && i == 2 {
+		for i1, innerNode := range Vis.innerNodes {
+			fmt.Printf("let node%d = [", i1+1)
+			for _, n2 := range innerNode {
+				fmt.Printf("%d,", n2.j)
+			}
+			fmt.Print("]")
+			fmt.Println()
 		}
 	}
 }
@@ -766,16 +783,16 @@ func Test(n int) {
 	buildBcube(n)
 
 	//调用算法二生成独立生成树
-	edges := BuildCISTsInLGBCN31(n, knn)
+	BuildCISTsInLGBCN31(n, knn)
 
 	//检查生成树的正确性
 	//CheckResult(edges)
 
 	//打印,需要不同的类型打印主要修改这里
-	helpToFindErr(edges)
+	// helpToFindErr(edges)
 
 	// 打印输出
-	// printToFile(n, edges)
+	//printToFile(n, edges)
 }
 
 func helpToFindErr(edges []Ek) {

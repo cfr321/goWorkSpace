@@ -1,8 +1,6 @@
 package main
 
 import (
-	"crypto/sha256"
-	"fmt"
 	"math"
 	"net/http"
 	"workspace/myUtil"
@@ -94,17 +92,85 @@ type student struct {
 	sex  string
 }
 
-func (s student) String() string {
-	return s.name + "    [][]   " + s.sex + "caonima"
+func (s student) Read(p []byte) (n int, err error) {
+	return 0, err
+}
+
+type Person struct {
+	name string
+}
+
+func storeWater(bucket []int, vat []int) int {
+	ans := math.MaxInt32
+	for i := 1; i < 10000; i++ {
+		cur := 0
+		for j := 0; j < len(vat); j++ {
+			k := (vat[j] + i - 1) / i
+			cur += max(0, k-bucket[j])
+		}
+		ans = min(ans, i+cur)
+	}
+	return ans
+}
+
+func max(a, b int) int {
+	if a < b {
+		return b
+	}
+	return a
+}
+func insert(intervals [][]int, newInterval []int) [][]int {
+	var res [][]int
+	app := false
+	left := newInterval[0]
+	right := newInterval[1]
+	for _, interval := range intervals {
+		if interval[0] > right {
+			if !app {
+				res = append(res, []int{left, right})
+				app = true
+			}
+			res = append(res, interval)
+		} else if interval[1] < left {
+			res = append(res, interval)
+		} else {
+			left = min(left, interval[0])
+			right = max(right, interval[1])
+		}
+	}
+	if !app {
+		res = append(res, []int{left, right})
+	}
+	return res
 }
 
 func main() {
-	s := "sha256 芳华"
+	//
+	//c := make(chan int)
+	//
+	//persons := make([]Person, 10)
+	//
+	//for i := 0; i < len(persons); i++ {
+	//	persons[i].name = "fff"
+	//}
+	//for i, _ := range persons {
+	//	//person.name = "ccc"
+	//	persons[i].name = "ccc"
+	//}
+	//<-c
+	//fmt.Println(math.MaxInt32)
+}
 
-	//h := sha256.New()
-	//h.Write([]byte(s))
-	//bs := h.Sum(nil)
+func combinationSum4(nums []int, target int) int {
 
-	bytes := sha256.Sum256([]byte(s))
-	fmt.Printf("origin: %s, sha256 hash: %x\n", s, bytes)
+	dp := make([]int, target+1)
+	dp[0] = 1
+	for i := 1; i <= target; i++ {
+		for j := 0; j < len(nums); j++ {
+			if nums[j] <= i {
+				dp[i] += dp[i-nums[j]]
+			}
+		}
+	}
+	return dp[target]
 }

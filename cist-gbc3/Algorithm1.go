@@ -2,8 +2,7 @@
 // Author: cfr
 //
 
-package Cist
-
+package cist
 
 type edge struct {
 	a, b int
