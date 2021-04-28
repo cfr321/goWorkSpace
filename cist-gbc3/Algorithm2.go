@@ -6,6 +6,7 @@ package cist
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"sort"
 	"strconv"
@@ -263,13 +264,14 @@ func INode_CISTs(Vis InnerNodeArraysInOneBCubeN1, W []bool) []edgeArray {
 	distributeNode(&Vis, W, sigma, n, h, i)
 	// 到此节点分类已经完成
 
-	//if h == 0 && i == 3 {
+	//if h == 0 && i == 84 {
 	//	for _, innerNode := range Vis.innerNodes {
 	//		fmt.Println("=======")
 	//		for _, n2 := range innerNode {
 	//			fmt.Print(n2.j)
 	//			fmt.Print(",")
 	//		}
+	//		fmt.Println()
 	//	}
 	//}
 
@@ -287,20 +289,20 @@ func INode_CISTs(Vis InnerNodeArraysInOneBCubeN1, W []bool) []edgeArray {
 	}
 
 	// 完成 sigma 那颗树的生成
-	//if i < t {
-	//	EiOfSigma := FPath(sigma, Vis)
-	//	Eits[sigma] = append(Eits[sigma], EiOfSigma...) //把这些点也加到对应的生成树里面
-	//} else {
-	//	EiOfSigma := LPath(sigma, Vis)
-	//	Eits[sigma] = append(Eits[sigma], EiOfSigma...) //把这些点也加到对应的生成树里面
-	//}
-	//
-	//path := VPath(sigma, Vis)
-	//for i := 0; i < t; i++ {
-	//	if i != sigma {
-	//		Eits[i] = append(Eits[i], path[i]...)
-	//	}
-	//}
+	if i < t {
+		EiOfSigma := FPath(sigma, Vis)
+		Eits[sigma] = append(Eits[sigma], EiOfSigma...) //把这些点也加到对应的生成树里面
+	} else {
+		EiOfSigma := LPath(sigma, Vis)
+		Eits[sigma] = append(Eits[sigma], EiOfSigma...) //把这些点也加到对应的生成树里面
+	}
+
+	path := VPath(sigma, Vis)
+	for i := 0; i < t; i++ {
+		if i != sigma {
+			Eits[i] = append(Eits[i], path[i]...)
+		}
+	}
 	return Eits //返回第i课Bcube(n,1)的所有独立生成树边
 }
 
@@ -356,58 +358,143 @@ func buildBcube(n int) {
 
 // 节点分入不同的独立生成树
 func distributeNode(Vis *InnerNodeArraysInOneBCubeN1, W []bool, sigma int, n int, h int, i int) {
-	var rk, p, time int
-	for round := 0; round < 2; round++ {
+
+	if t == 2 {
+		for j := 0; j < np; j++ {
+			if W[j] {
+				Vis.innerNodes[1-sigma] = append(Vis.innerNodes[1-sigma], node{h, i, j})
+			}
+		}
+	} else {
+		var l, rt int
+		if i < t {
+			l = n/2 + 1
+			rt = n - 1
+		} else {
+			l = 1
+			rt = n/2 - 1
+		}
+
+		for r := l; r <= rt; r++ {
+			f := r - l
+			for k := 0; k < t; k++ {
+				if k != sigma {
+					Vis.innerNodes[k] = append(Vis.innerNodes[k], node{h, i, r*n + f})
+					Vis.innerNodes[k] = append(Vis.innerNodes[k], node{h, i, r*n + f + 1})
+					W[r*n+f] = false
+					W[r*n+f+1] = false
+					f += 2
+				}
+			}
+		}
+
+		var rsigma int
+		mainNodes := Vis.innerNodes[sigma]
+		if i < t {
+			rsigma = mainNodes[len(mainNodes)-1].j
+		} else {
+			rsigma = mainNodes[rsigma].j
+		}
+
+		Y := rsigma / n
+
+		flag := make([]int, t)
 		for k := 0; k < t; k++ {
 			if k != sigma {
-				Vik := &Vis.innerNodes[k] //便于操作
-				rk = (*Vik)[0].j
-				if round == 0 {
-					p = 0
-				} else {
-					p = 1
-					time = 0
-				}
-				var c = -rk / n
-				for p != n {
-					if time == 2 && round == 1 {
-						p++
-					}
-					pos := rk + p + c*n
-					if pos < np && W[pos] {
-						*Vik = append(*Vik, node{h, i, pos})
-						W[pos] = false
-						p++
-						c++
-						time = 0
-					} else {
-						c++
-					}
-					if rk+p+c*n >= np || rk+p+c*n < 0 {
-						c = -rk / n
-						time++
-					}
+				if Vis.innerNodes[k][0].j/n == Y {
+					flag[k] = 1
 				}
 			}
 		}
-	}
 
-	//将剩余的点加到以此加入
-	for i2 := 0; i2 < np; i2++ {
-		if W[i2] { //代表点还在剩余集合中
-			id := Vis.minLenId() //获取内联点集集合最短的
-			Vis.innerNodes[id] = append(Vis.innerNodes[id], node{h, i, i2})
-		}
-	}
-	if h == 0 && i == 2 {
-		for i1, innerNode := range Vis.innerNodes {
-			fmt.Printf("let node%d = [", i1+1)
-			for _, n2 := range innerNode {
-				fmt.Printf("%d,", n2.j)
+		Wj := make([][]int, t)
+		for k := 0; k < t; k++ {
+			Wj[k] = make([]int, n)
+			if k != sigma {
+				for _, n2 := range Vis.innerNodes[k] {
+					Wj[k][n2.j%n]++
+				}
 			}
-			fmt.Print("]")
-			fmt.Println()
 		}
+
+		for i2 := 0; i2 < np; i2++ {
+			if W[i2] {
+				j := i2 % n
+				var minK int
+				var minLen = math.MaxInt32
+				for k := 0; k < t; k++ { //找j列占数最少的 内节点集合
+					if k != sigma {
+						if Wj[k][j] < minLen {
+							minK = k
+							minLen = Wj[k][j]
+						}
+					}
+				}
+				Vis.innerNodes[minK] = append(Vis.innerNodes[minK], node{h, i, i2})
+				Wj[minK][j]++
+				if i2/n == Y {
+					flag[minK]++
+				}
+			}
+		}
+
+		for k := 0; k < t; k++ {
+			if k != sigma && flag[k] == 0 {
+				for f := 0; f < t; f++ {
+					if f != sigma && flag[f] > 1 {
+						d := -1
+						for i2, n2 := range Vis.innerNodes[f] {
+							if i2 != 0 && n2.j/n == Y {
+								d = n2.j % n
+								if Wj[k][d] > 2 || d >= (2*(t-1)+n/2-2) {
+									Vis.innerNodes[k] = append(Vis.innerNodes[k], n2)
+									Vis.innerNodes[f] = append(Vis.innerNodes[f][0:i2], Vis.innerNodes[f][i2+1:]...)
+									break
+								}
+							}
+						}
+						if d != -1 {
+							for i2, n2 := range Vis.innerNodes[k] {
+								if i2 > 2*(n/2-1) {
+									if n2.j%n == d {
+										Vis.innerNodes[f] = append(Vis.innerNodes[f], n2)
+										Vis.innerNodes[k] = append(Vis.innerNodes[k][0:i2], Vis.innerNodes[k][i2+1:]...)
+										break
+									}
+								}
+							}
+							flag[k]++
+							flag[f]--
+							break
+						}
+					}
+				}
+			}
+		}
+
+		for i2, innerNode := range Vis.innerNodes {
+			if i2 != sigma {
+				rem := make([]bool, n)
+				pos := 0
+				for i3 := 0; pos < n && i3 < len(innerNode); i3++ {
+					if rem[innerNode[i3].j%n] == false {
+						rem[innerNode[i3].j%n] = true
+						Vis.innerNodes[i2][i3], Vis.innerNodes[i2][pos] = Vis.innerNodes[i2][pos], Vis.innerNodes[i2][i3]
+						pos++
+					}
+				}
+				rem = make([]bool, n)
+				pos = n
+				for i3 := n; pos < 2*n && i3 < len(innerNode); i3++ {
+					if rem[innerNode[i3].j%n] == false {
+						rem[innerNode[i3].j%n] = true
+						Vis.innerNodes[i2][i3], Vis.innerNodes[i2][pos] = Vis.innerNodes[i2][pos], Vis.innerNodes[i2][i3]
+						pos++
+					}
+				}
+			}
+		}
+
 	}
 }
 
@@ -780,13 +867,21 @@ func distributeVk(array nodeArray) []nodeArray {
 func Test(n int) {
 	//准备工作
 	knn := BuildCISTinKNN(n)
+	for _, t2 := range knn {
+		sort.Slice(t2.edges, func(i, j int) bool {
+			if t2.edges[i].a == t2.edges[j].a {
+				return t2.edges[i].b < t2.edges[j].b
+			}
+			return t2.edges[i].a < t2.edges[j].a
+		})
+	}
 	buildBcube(n)
 
 	//调用算法二生成独立生成树
-	BuildCISTsInLGBCN31(n, knn)
+	edges := BuildCISTsInLGBCN31(n, knn)
 
 	//检查生成树的正确性
-	//CheckResult(edges)
+	CheckResult(edges)
 
 	//打印,需要不同的类型打印主要修改这里
 	// helpToFindErr(edges)
@@ -931,13 +1026,13 @@ func printToFile(n int, edges []Ek) {
 	for i := 0; i < t; i++ {
 		_, _ = fmt.Fprintf(file, "begin\n")
 		for _, e := range edges[i].edges {
-			fmt.Fprintf(file, "%d-%d-%d %d-%d-%d\n", e.left.h, e.left.i, e.left.j, e.right.h, e.right.i, e.right.j)
+			_, _ = fmt.Fprintf(file, "%d-%d-%d %d-%d-%d\n", e.left.h, e.left.i, e.left.j, e.right.h, e.right.i, e.right.j)
 		}
 	}
-	fmt.Fprintf(file, "end\n")
+	_, _ = fmt.Fprintf(file, "end\n")
 	fmt.Printf("已生成。。。\n请查看文件%s\n", fileName[2:])
 	tmp := 0
-	fmt.Scan(&tmp)
+	_, _ = fmt.Scan(&tmp)
 }
 
 func TestSort() {
