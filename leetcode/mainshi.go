@@ -92,3 +92,6 @@ func isFlipedString(s1 string, s2 string) bool {
 	//}
 	//return false
 }
+func test() {
+	// add something to test
+}
