@@ -24,3 +24,23 @@ func getImportanceByMap(m map[int]*Employee, id int) int {
 	}
 	return ans
 }
+
+// 554砖墙  2021 - 5.2
+func leastBricks(wall [][]int) int {
+	rem := make(map[int]int)
+	for i := 0; i < len(wall); i++ {
+		tmp := 0
+		for j := 0; j < len(wall[i])-1; j++ {
+			tmp += wall[i][j]
+			rem[tmp]++
+		}
+	}
+	var ans = len(wall)
+	var maxSize = 0
+	for _, size := range rem {
+		if size > maxSize {
+			maxSize = size
+		}
+	}
+	return ans - maxSize
+}
