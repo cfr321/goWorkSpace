@@ -59,7 +59,7 @@ func replaceSpaces(S string, length int) string {
 func canPermutePalindrome(s string) bool {
 	rem := make([]int, 128)
 	for i := 0; i < len(s); i++ {
-		rem[s[i]] ++
+		rem[s[i]]++
 	}
 	res := 0
 	for i := 0; i < 128; i++ {
@@ -83,7 +83,7 @@ func oneEditAway(first string, second string) bool {
 		if first[a] == second[b] {
 			a++
 			b++
-		}else{
+		} else {
 			if flag == 1 {
 				return false
 			}
@@ -91,9 +91,9 @@ func oneEditAway(first string, second string) bool {
 			if lena == lenb {
 				a++
 				b++
-			}else if lena > lenb{
+			} else if lena > lenb {
 				a++
-			}else {
+			} else {
 				b++
 			}
 		}
@@ -211,4 +211,66 @@ func isFlipedString(s1 string, s2 string) bool {
 }
 func test() {
 	// add something to test
+}
+
+// 02.01
+func removeDuplicateNodes(head *ListNode) *ListNode {
+	if head == nil {
+		return head
+	}
+	var rem [200001]bool
+	rem[head.Val] = true
+	pre := head
+	for pre.Next != nil {
+		if rem[pre.Next.Val] {
+			pre.Next = pre.Next.Next
+		} else {
+			rem[pre.Next.Val] = true
+			pre = pre.Next
+		}
+	}
+	return head
+}
+
+// 02.02
+func kthToLast(head *ListNode, k int) int {
+	var front, back = head, head
+	for front != nil {
+		front = front.Next
+		k--
+		if k < 0 {
+			back = back.Next
+		}
+	}
+	return back.Val
+}
+
+// 02.03
+func deleteNode(node *ListNode) {
+	if node.Next == nil {
+		node = nil
+	} else {
+		node.Val = node.Next.Val
+		node.Next = node.Next.Next
+	}
+}
+
+// 02.08
+func detectCycle(head *ListNode) *ListNode {
+	fast, slow := head, head
+
+	for fast == head || slow != fast {
+		if fast != nil && fast.Next != nil {
+			fast = fast.Next.Next
+		} else {
+			return nil
+		}
+		slow = slow.Next
+	}
+	fast = head
+	for slow != fast {
+		slow = slow.Next
+		fast = fast.Next
+	}
+	return slow
 }
