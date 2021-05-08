@@ -3,8 +3,6 @@
 //
 package main
 
-import "fmt"
-
 type ListNode struct {
 	Val  int
 	Next *ListNode
@@ -35,10 +33,4 @@ func rotateRight(head *ListNode, k int) *ListNode {
 }
 func addSlice(arr *[]int) {
 	*arr = append(*arr, 1)
-}
-func main() {
-
-	ints := make([]int, 10)
-	addSlice(&ints)
-	fmt.Print(ints)
 }

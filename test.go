@@ -3,6 +3,7 @@ package main
 import (
 	"math"
 	"net/http"
+	"sort"
 	"workspace/myUtil"
 )
 
@@ -144,21 +145,56 @@ func insert(intervals [][]int, newInterval []int) [][]int {
 	return res
 }
 
+var ans1723 int
+
+type work struct {
+	id       int
+	workTime int
+}
+
+var works []work
+
+func minimumTimeRequired(jobs []int, k int) int {
+	works = make([]work, k)
+	for i := 0; i < k; i++ {
+		works[i].workTime = 0
+		works[i].id = i
+	}
+	ans1723 = math.MaxInt32
+	dfs1723(0, jobs, 0)
+	return ans1723
+}
+
+func dfs1723(i int, jobs []int, tmp int) {
+	if i == len(jobs) {
+		if tmp < ans1723 {
+			ans1723 = tmp
+		}
+		return
+	}
+	sort.Slice(works, func(i, j int) bool {
+		return works[i].workTime < works[j].workTime
+	})
+	cop := make([]work, len(works))
+	copy(cop, works)
+	for j := 0; j < len(works); j++ {
+		if j == 0 || works[j].workTime != works[j-1].workTime {
+			if works[j].workTime+jobs[i] < ans1723 {
+				works[j].workTime += jobs[i]
+				tmpId := works[j].id
+				dfs1723(i+1, jobs, max(tmp, works[j].workTime))
+				for k := 0; k < len(works); k++ {
+					if works[k].id == tmpId {
+						works[k].workTime -= jobs[i]
+						break
+					}
+				}
+			}
+		}
+	}
+}
 func main() {
-	//
-	//c := make(chan int)
-	//
-	//persons := make([]Person, 10)
-	//
-	//for i := 0; i < len(persons); i++ {
-	//	persons[i].name = "fff"
-	//}
-	//for i, _ := range persons {
-	//	//person.name = "ccc"
-	//	persons[i].name = "ccc"
-	//}
-	//<-c
-	//fmt.Println(math.MaxInt32)
+	println(minimumTimeRequired([]int{1, 2, 4, 7, 8}, 2))
 }
 
 func combinationSum4(nums []int, target int) int {

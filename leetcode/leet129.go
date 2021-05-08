@@ -4,17 +4,16 @@
 
 package main
 
-import "fmt"
-
 type TreeNode struct {
 	Val   int
 	Left  *TreeNode
 	Right *TreeNode
 }
 
-var res =0
+var res = 0
+
 func sumNumbers(root *TreeNode) int {
-	res=0
+	res = 0
 	if root == nil {
 		return res
 	}
@@ -35,31 +34,28 @@ func dfs(root *TreeNode, i int) {
 	}
 }
 func islandPerimeter(grid [][]int) int {
-	if len(grid)==0 {
+	if len(grid) == 0 {
 		return 0
 	}
-	res:=0
+	res := 0
 	for i := 0; i < len(grid); i++ {
 		for j := 0; j < len(grid[0]); j++ {
 			if grid[i][j] == 1 {
-				res+=4
-				if i !=0 && grid[i-1][j] == 1 {
+				res += 4
+				if i != 0 && grid[i-1][j] == 1 {
 					res--
 				}
 				if i < len(grid)-1 && grid[i+1][j] == 1 {
 					res--
 				}
-				if j!=0 && grid[i][j-1] == 1{
+				if j != 0 && grid[i][j-1] == 1 {
 					res--
 				}
-				if j!=len(grid[0])-1 && grid[i][j+1]==1 {
+				if j != len(grid[0])-1 && grid[i][j+1] == 1 {
 					res--
 				}
 			}
 		}
 	}
 	return res
-}
-func main() {
-	fmt.Print(res)
 }

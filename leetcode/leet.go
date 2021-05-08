@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math"
 	"sort"
 )
@@ -132,7 +133,7 @@ func deleteAndEarn(nums []int) int {
 }
 
 // 1720. 解码异或后的数组 2021.5.7
-func decode(encoded []int, first int) []int {
+func Decode(encoded []int, first int) []int {
 	var tmp int
 	for i := 0; i < len(encoded); i++ {
 		tmp = first
@@ -141,4 +142,41 @@ func decode(encoded []int, first int) []int {
 	}
 	encoded = append(encoded, first)
 	return encoded
+}
+
+// 1486. 数组异或操作  2021.5.7
+
+// 1723. 完成所有工作的最短时间 2021.5.8
+var ans1723 int
+
+func minimumTimeRequired(jobs []int, k int) int {
+	workTime := make([]int, k)
+	ans1723 = math.MaxInt32
+	dfs1723(0, jobs, 0, workTime)
+	return ans1723
+}
+
+func dfs1723(i int, jobs []int, tmp int, workTime []int) {
+	if i == len(jobs) {
+		if tmp < ans1723 {
+			ans1723 = tmp
+		}
+		return
+	}
+	sort.Ints(workTime)
+	for j := 0; j < len(workTime); j++ {
+		if workTime[j]+jobs[i] < ans1723 {
+			if j > 0 && workTime[j] == workTime[j-1] {
+				continue
+			}
+			workTime[j] += jobs[i]
+			cop := make([]int, len(workTime))
+			copy(cop, workTime)
+			dfs1723(i+1, jobs, max(tmp, workTime[j]), cop)
+			workTime[j] -= jobs[i]
+		}
+	}
+}
+func main() {
+	fmt.Println("   ")
 }

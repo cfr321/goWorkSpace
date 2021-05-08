@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 func isScramble(s1 string, s2 string) bool {
 	l := len(s1)
 	if len(s2) != l {
@@ -32,9 +30,4 @@ func isScramble(s1 string, s2 string) bool {
 		}
 	}
 	return dp[0][0][l]
-}
-
-func main() {
-
-	fmt.Println(isScramble("abcdbdacbdac", "bdacabcdbdac"))
 }

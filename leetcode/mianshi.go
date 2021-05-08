@@ -274,3 +274,52 @@ func detectCycle(head *ListNode) *ListNode {
 	}
 	return slow
 }
+
+// 03.02
+type StackOfPlates struct {
+	cap    int
+	stacks [][]int
+}
+
+func Constructor5(cap int) StackOfPlates {
+	return StackOfPlates{cap: cap, stacks: [][]int{}}
+}
+
+func (this *StackOfPlates) Push(val int) {
+	l := len(this.stacks)
+	if l == 0 || len(this.stacks[l-1]) == this.cap {
+		this.stacks = append(this.stacks, []int{})
+	}
+	l = len(this.stacks)
+	this.stacks[l-1] = append(this.stacks[l-1], val)
+}
+
+func (this *StackOfPlates) Pop() int {
+	l := len(this.stacks)
+	if l == 0 {
+		return -1
+	}
+	l1 := len(this.stacks[l-1])
+	re := this.stacks[l-1][l1-1]
+	if l1 == 1 {
+		this.stacks = this.stacks[0 : l-1]
+	} else {
+		this.stacks[l-1] = this.stacks[l-1][0 : l1-1]
+	}
+	return re
+}
+
+func (this *StackOfPlates) PopAt(index int) int {
+	l := len(this.stacks)
+	if l == 0 || index > l-1 {
+		return -1
+	}
+	l1 := len(this.stacks[index])
+	re := this.stacks[index][l1-1]
+	if l1 == 1 {
+		this.stacks = append(this.stacks[0:index], this.stacks[index+1:l]...)
+	} else {
+		this.stacks[index] = this.stacks[index][0 : l1-1]
+	}
+	return re
+}
