@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math"
+	"reflect"
 	"sort"
 )
 
@@ -177,6 +178,98 @@ func dfs1723(i int, jobs []int, tmp int, workTime []int) {
 		}
 	}
 }
+
+func minDays(bloomDay []int, m int, k int) int {
+	if len(bloomDay) < m*k {
+		return -1
+	}
+	r := 0
+	l := math.MaxInt32
+	for i := 0; i < len(bloomDay); i++ {
+		if bloomDay[i] > r {
+			r = bloomDay[i]
+		}
+		if bloomDay[i] < l {
+			l = bloomDay[i]
+		}
+	}
+
+	for l < r {
+		m := (l + r) / 2
+		tmp := 0
+		sum := 0
+		for i := 0; i < len(bloomDay); i++ {
+			if bloomDay[i] <= m {
+				tmp++
+				if tmp == k {
+					sum++
+					tmp = 0
+				}
+			} else {
+				tmp = 0
+			}
+		}
+		if sum >= m {
+			r = m
+		} else {
+			l = m + 1
+		}
+	}
+	return l
+}
+
+func leafSimilar(root1 *TreeNode, root2 *TreeNode) bool {
+	leafs1 := getLeaf(root1)
+	leafs2 := getLeaf(root2)
+	if len(leafs1) != len(leafs2) {
+		return false
+	}
+	for i := 0; i < len(leafs1); i++ {
+		if leafs1[i] != leafs2[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func getLeaf(root *TreeNode) []int {
+	var leafs []int
+	if root != nil {
+		dfs872(root, &leafs)
+	}
+	return leafs
+}
+
+func dfs872(root *TreeNode, i *[]int) {
+	if root.Left == nil && root.Right == nil {
+		*i = append(*i, root.Val)
+		return
+	}
+	if root.Left != nil {
+		dfs872(root.Left, i)
+	}
+	if root.Right != nil {
+		dfs872(root.Right, i)
+	}
+}
+
+type Dog struct {
+	Id   int
+	Name string
+}
+
+var m map[string]interface{}
+
+func get(key string, tmp interface{}) {
+	value := m[key]
+	reflect.ValueOf(tmp).Elem().Set(reflect.ValueOf(value))
+}
+
 func main() {
-	fmt.Println("   ")
+	m = make(map[string]interface{})
+	m["a"] = 1
+	m["b"] = Dog{1, "cfr"}
+	var tmp Dog
+	get("b", &tmp)
+	fmt.Println(tmp)
 }
