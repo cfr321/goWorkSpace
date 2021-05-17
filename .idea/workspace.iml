@@ -2,6 +2,8 @@
 <module type="WEB_MODULE" version="4">
   <component name="Go" enabled="true" />
   <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$/../../../../Users/摇井/OneDrive/桌面/git/rosedb" />
+    <content url="file://$MODULE_DIR$/../swelldb" />
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

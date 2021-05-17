@@ -1,8 +1,11 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"math"
 	"net/http"
+	"runtime"
 	"sort"
 	"workspace/myUtil"
 )
@@ -193,8 +196,21 @@ func dfs1723(i int, jobs []int, tmp int) {
 		}
 	}
 }
+
+var c = flag.Bool("c", false, "something")
+
 func main() {
-	println(minimumTimeRequired([]int{1, 2, 4, 7, 8}, 2))
+	var m runtime.MemStats
+	funcName()
+	runtime.ReadMemStats(&m)
+	fmt.Printf("%+v\n", m.Sys)
+}
+
+func funcName() {
+	ints := make([]int, 30000000)
+	for i := 0; i < 30000000; i++ {
+		ints[i] = 1
+	}
 }
 
 func combinationSum4(nums []int, target int) int {

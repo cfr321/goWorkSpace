@@ -265,6 +265,94 @@ func get(key string, tmp interface{}) {
 	reflect.ValueOf(tmp).Elem().Set(reflect.ValueOf(value))
 }
 
+func decode(encoded []int) []int {
+	oxN := 0
+	for i := 1; i <= len(encoded)+1; i++ {
+		oxN ^= i
+	}
+	first := 0
+	for i := 1; i < len(encoded); i += 2 {
+		first ^= encoded[i]
+	}
+	var ans []int
+	ans = append(ans, first)
+	for i := 0; i < len(encoded); i++ {
+		ans = append(ans, ans[i]^encoded[i])
+	}
+	return ans
+}
+
+func findMaximumXOR1(nums []int) int {
+	if len(nums) <= 1 {
+		return 0
+	}
+	x := 0
+	for k := 30; k >= 0; k-- {
+		m := make(map[int]struct{})
+		for i := 0; i < len(nums); i++ {
+			m[nums[i]>>k] = struct{}{}
+		}
+		x_next := 2*x + 1
+		find := false
+		for _, num := range nums {
+			if _, ok := m[x_next^(num>>k)]; ok {
+				find = true
+				break
+			}
+		}
+		if find {
+			x = x_next
+		} else {
+			x = x_next - 1
+		}
+	}
+	return x
+}
+func isCousins(root *TreeNode, x int, y int) bool {
+	if root.Val == x || root.Val == y {
+		return false
+	}
+	last := root
+	var queue []*TreeNode
+	queue = append(queue, root)
+	var lx, ly, l int
+	l = 1
+	var px, py *TreeNode
+	for len(queue) != 0 {
+		root = queue[0]
+		queue = queue[1:]
+		if root.Left != nil {
+			if root.Left.Val == x {
+				lx = l
+				px = root
+			}
+			if root.Left.Val == y {
+				ly = l
+				py = root
+			}
+			queue = append(queue, root.Left)
+		}
+		if root.Right != nil {
+			if root.Right.Val == x {
+				lx = l
+				px = root
+			}
+			if root.Right.Val == y {
+				ly = l
+				py = root
+			}
+			queue = append(queue, root.Right)
+		}
+		if last == root {
+			l++
+			last = queue[len(queue)-1]
+		}
+		if lx != 0 && ly != 0 {
+			break
+		}
+	}
+	return lx == ly && px != py
+}
 func main() {
 	m = make(map[string]interface{})
 	m["a"] = 1
