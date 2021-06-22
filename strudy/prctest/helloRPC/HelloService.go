@@ -41,10 +41,12 @@ func mustCopy(out io.Writer, in io.Reader) {
 
 func rpc1() {
 	rpc.Register(new(HelloService))
+
 	rpc.HandleHTTP()
 	serve, err := net.Listen("tcp", ":1234")
 	if err != nil {
 		log.Fatal("listenTCP fatal", err)
 	}
 	http.Serve(serve, nil)
+
 }

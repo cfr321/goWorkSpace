@@ -1,17 +1,174 @@
 package main
 
 import (
-	"fmt"
 	"math"
+	"math/bits"
 	"reflect"
 	"sort"
+	"strconv"
 )
 
-//Definition for Employee.
+// Definition for Employee.
 type Employee struct {
 	Id           int
 	Importance   int
 	Subordinates []int
+}
+
+//func firstBadVersion(n int) int {
+//	l, r := 1, n
+//	for l < r {
+//		m := (l + r) / 2
+//		if isBadVersion(m) {
+//			r = m
+//		} else {
+//			l = m + 1
+//		}
+//	}
+//	return l
+//}
+
+type ThroneInheritance struct {
+	kingName string
+	nodes    map[string][]string
+}
+
+var deathed map[string]struct{}
+
+//func Constructor(kingName string) ThroneInheritance {
+//	deathed = make(map[string]struct{})
+//	tmp := ThroneInheritance{kingName: kingName, nodes: make(map[string][]string)}
+//	return tmp
+//}
+//
+//func (this *ThroneInheritance) Birth(parentName string, childName string) {
+//	this.nodes[parentName] = append(this.nodes[parentName], childName)
+//}
+//
+//func (this *ThroneInheritance) Death(name string) {
+//	deathed[name] = struct{}{}
+//}
+//
+//func (this *ThroneInheritance) GetInheritanceOrder() []string {
+//	res := []string{}
+//	preOder(this.kingName, this.nodes, &res)
+//	return res
+//}
+
+func preOder(name string, nodes map[string][]string, res *[]string) {
+	if _, ok := deathed[name]; !ok {
+		*res = append(*res, name)
+	}
+	for _, son := range nodes[name] {
+		preOder(son,nodes,res)
+	}
+}
+
+
+
+func maxLength(arr []string) int {
+	ans := 0
+	var nums []uint32
+	var lens []int
+	lens = append(lens, 0)
+	for i := 0; i < len(arr); i++ {
+		var t uint32
+		app := true
+		for j := 0; j < len(arr[i]); j++ {
+			if (t & (1 << (arr[i][j] - 'a'))) != 0 {
+				app = false
+				break
+			}
+			t |= 1 << (arr[i][j] - 'a')
+		}
+		if app {
+			nums = append(nums, t)
+			lens = append(lens, lens[len(nums)]+len(arr[i]))
+		}
+	}
+
+	dfs1239(nums, lens, 0, 0, &ans, 0)
+	return ans
+}
+
+func dfs1239(arr []uint32, lens []int, k int, tmp int, ans *int, selected uint32) {
+	if k == len(arr) {
+		if tmp > *ans {
+			*ans = tmp
+		}
+		return
+	}
+	if (selected & arr[k]) == 0 {
+		dfs1239(arr, lens, k+1, tmp+lens[k+1]-lens[k], ans, selected|arr[k])
+	}
+	if tmp+lens[len(arr)]-lens[k+1] > *ans {
+		dfs1239(arr, lens, k+1, tmp, ans, selected)
+	}
+}
+
+func smallestGoodBase(n string) string {
+	num, _ := strconv.Atoi(n)
+	maxl := bits.Len(uint(num)) - 1
+	for i := maxl; i > 1; i-- {
+		k := int(math.Pow(float64(num), float64(i)))
+		sum := 1
+		mul := 1
+		for j := 0; j < i; j++ {
+			mul *= k
+			sum += mul
+		}
+		if sum == num {
+			return strconv.Itoa(k)
+		}
+	}
+	return strconv.Itoa(num - 1)
+}
+
+// 2021  6.6
+func findMaxForm(strs []string, m int, n int) int {
+
+	num0 := make([]int, len(strs))
+	num1 := make([]int, len(strs))
+	for i := 0; i < len(strs); i++ {
+		n0, n1 := 0, 0
+		for _, c := range strs[i] {
+			if c == '1' {
+				n1++
+			} else {
+				n0++
+			}
+		}
+		num0[i] = n0
+		num1[i] = n1
+	}
+	dp := [101][101]int{}
+	for i := 0; i < len(num0); i++ {
+		for j := m; j >= num0[i]; j-- {
+			for k := n; k >= num1[i]; k-- {
+				dp[j][k] = max(dp[j][k], dp[j-num0[i]][k-num1[i]]+1)
+			}
+		}
+	}
+	return dp[m][n]
+}
+
+// 6.3   找到零和一数量相同的最长连续子数组长度
+func findMaxLength(nums []int) int {
+	num1, num0 := 0, 0
+	rem := make(map[int]int)
+	rem[0] = -1
+	ans := 0
+	for i := 0; i < len(nums); i++ {
+		num1 += nums[i]
+		num0 += 1 - nums[i]
+		nums[i] = num1 - num0
+		if p, ok := rem[nums[i]]; !ok {
+			rem[nums[i]] = i
+		} else {
+			ans = max(i-p, ans)
+		}
+	}
+	return ans
 }
 
 // Leetcode 690  5.1
@@ -353,11 +510,98 @@ func isCousins(root *TreeNode, x int, y int) bool {
 	}
 	return lx == ly && px != py
 }
+
+func kthLargestValue(matrix [][]int, k int) int {
+	nums := []int{}
+	for i := 1; i < len(matrix); i++ {
+		matrix[i][0] ^= matrix[i-1][0]
+		nums = append(nums, matrix[i][0])
+	}
+	for i := 1; i < len(matrix[0]); i++ {
+		matrix[0][i] ^= matrix[0][i-1]
+		nums = append(nums, matrix[0][i])
+	}
+	for i := 1; i < len(matrix); i++ {
+		for j := 1; j < len(matrix[0]); j++ {
+			matrix[i][j] ^= matrix[i-1][j-1] ^ matrix[i-1][j] ^ matrix[i][j-1]
+			nums = append(nums, matrix[i][j])
+		}
+	}
+	return quickSelect(nums, k)
+}
+
+func quickSelect(nums []int, k int) int {
+	l := 0
+	r := len(nums) - 1
+	for l < r {
+		i := l
+		j := r
+		val := nums[l]
+		for i < j {
+			for j > i && nums[j] <= val {
+				j--
+			}
+			nums[i] = nums[j]
+			i++
+			for i < j && nums[i] >= val {
+				i++
+			}
+			nums[j] = nums[i]
+			j--
+		}
+		nums[i] = val
+		if i+1 == k {
+			break
+		} else if i+1 > k {
+			r = i - 1
+		} else {
+			l = i + 1
+		}
+	}
+	return nums[k-1]
+}
+
+type stringTime struct {
+	i   int
+	str string
+}
+
+func topKFrequent(words []string, k int) []string {
+	m := make(map[string]int)
+	for _, word := range words {
+		m[word]++
+	}
+	var strs []stringTime
+	for s, i := range m {
+		strs = append(strs, stringTime{i, s})
+	}
+	sort.Slice(strs, func(i, j int) bool {
+		if strs[i].i == strs[j].i {
+			return strs[i].str < strs[j].str
+		}
+		return strs[i].i > strs[j].i
+	})
+	var ans []string
+	for i := 0; i < k; i++ {
+		ans = append(ans, strs[i].str)
+	}
+	return ans
+}
+
+func maxUncrossedLines(nums1 []int, nums2 []int) int {
+	dp := make([][]int, len(nums1)+1)
+	for i := 0; i < len(nums1); i++ {
+		dp[i] = make([]int, len(nums2)+1)
+		for j := 0; j < len(nums2); j++ {
+			if nums1[i] == nums2[j] {
+				dp[i+1][j+1] = dp[i-1][j-1] + 1
+			} else {
+				dp[i+1][j+1] = max(dp[i+1][j], dp[i][j+1])
+			}
+		}
+	}
+	return dp[len(nums1)][len(nums2)]
+}
+
 func main() {
-	m = make(map[string]interface{})
-	m["a"] = 1
-	m["b"] = Dog{1, "cfr"}
-	var tmp Dog
-	get("b", &tmp)
-	fmt.Println(tmp)
 }

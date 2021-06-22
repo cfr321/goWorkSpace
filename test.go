@@ -2,11 +2,12 @@ package main
 
 import (
 	"flag"
-	"fmt"
+	"io/fs"
+	"io/ioutil"
 	"math"
 	"net/http"
-	"runtime"
 	"sort"
+	"strings"
 	"workspace/myUtil"
 )
 
@@ -199,11 +200,48 @@ func dfs1723(i int, jobs []int, tmp int) {
 
 var c = flag.Bool("c", false, "something")
 
+type Noname interface {
+	add()
+	// a string
+}
+
+type Sun struct {
+	a int
+}
+
+func (s Sun) add() {
+	s.a++
+}
+
+func Newnoname() Noname {
+	return &Sun{1}
+}
+func add(s Sun) {
+
+}
 func main() {
-	var m runtime.MemStats
-	funcName()
-	runtime.ReadMemStats(&m)
-	fmt.Printf("%+v\n", m.Sys)
+	s := &Sun{1}
+	s.add()
+}
+
+
+func readDir(path string) {
+	dir, _ := ioutil.ReadDir(path)
+	for _, file := range dir {
+		filePath := path + "/" + file.Name()
+		if !file.IsDir() {
+			pocessFile(filePath)
+		} else {
+			readDir(filePath)
+		}
+	}
+}
+func pocessFile(filePath string) {
+	if strings.HasSuffix(filePath, ".java") {
+		content, _ := ioutil.ReadFile(filePath)
+		all := strings.ReplaceAll(string(content), "杨德石", "Lyy")
+		_ = ioutil.WriteFile(filePath, []byte(all), fs.ModeAppend)
+	}
 }
 
 func funcName() {

@@ -1,0 +1,13 @@
+syntax = "proto3"; // 版本声明，使用Protocol Buffers v3版本
+package pb; // 包名
+option go_package = "/pb";
+service SynaCtrl{
+  rpc SetTimeAndGetMsg(Req) returns (Rep){}
+}
+message Req{
+  int32 time = 1;
+  int32 rank = 2;
+}
+message Rep{
+  bool syn = 1;
+}

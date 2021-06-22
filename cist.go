@@ -16,3 +16,4 @@ func main() {
 	fmt.Scan(&n)
 	cist.Test(n)
 }
+
