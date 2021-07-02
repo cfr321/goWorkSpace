@@ -28,6 +28,192 @@ type Employee struct {
 //	return l
 //}
 
+func numWays(n int, relation [][]int, k int) int {
+	path := make([][]int, 10)
+	for _, rela := range relation {
+		path[rela[0]] = append(path[rela[0]], rela[1])
+	}
+	var ans int
+	dfsnumWays(path, 0, 0, k, n-1, &ans)
+	return ans
+}
+
+func dfsnumWays(path [][]int, tk int, tn int, k int, n int, ans *int) {
+	if tk == k {
+		if tn == n {
+			*ans ++
+		}
+		return
+	}
+	for i := 0; i < len(path[tn]); i++ {
+		dfsnumWays(path,tk+1,path[tn][i],k,n,ans)
+	}
+}
+func convertToTitle(columnNumber int) string {
+	var ans []byte
+	for columnNumber > 0 {
+		tmp := (columnNumber - 1) % 26
+		ans = append([]byte{byte(tmp + 'A')}, ans...)
+		columnNumber -= tmp + 1
+		columnNumber /= 26
+	}
+	return string(ans)
+}
+func snakesAndLadders(board [][]int) int {
+	lr := len(board)
+	lc := len(board[0])
+	end := lr * lc
+	points := make([]int, end+1)
+	flag := 0
+	p := 1
+	for i := lr - 1; i >= 0; i-- {
+		if flag == 0 {
+			flag = 1
+			for j := 0; j < lc; j++ {
+				points[p] = board[i][j]
+				p++
+			}
+		} else {
+			flag = 0
+			for j := lc - 1; j >= 0; j-- {
+				points[p] = board[i][j]
+				p++
+			}
+		}
+
+	}
+	step := make([]int, end+1)
+	step[1] = 1
+	var queue []int
+	queue = append(queue, 1)
+	for len(queue) > 0 {
+		tmp := queue[0]
+		queue = queue[1:]
+		if tmp == end {
+			return step[tmp] - 1
+		}
+		for next := tmp + 1; next < tmp+7 && next <= end; next++ {
+			if points[next] != -1 {
+				if step[points[next]] == 0 {
+					step[points[next]] = step[tmp] + 1
+					queue = append(queue, points[next])
+				}
+			} else {
+				if step[next] == 0 {
+					step[next] = step[tmp] + 1
+					queue = append(queue, next)
+				}
+			}
+		}
+	}
+	return -1
+}
+func slidingPuzzle(board [][]int) int {
+	var queue []string
+	begin := ""
+	end := "123450"
+	for i := 0; i < 2; i++ {
+		for j := 0; j < 3; j++ {
+			begin += strconv.Itoa(board[i][j])
+		}
+	}
+	visit := make(map[string]int)
+	visit[begin] = 0
+	queue = append(queue, begin)
+	for len(queue) > 0 {
+		p := queue[0]
+		queue = queue[1:]
+		if p == end {
+			return visit[p]
+		}
+		nexts := getNexts([]byte(p))
+		for i := 0; i < len(nexts); i++ {
+			if _, ok := visit[nexts[i]]; !ok {
+				visit[nexts[i]] = visit[p] + 1
+				queue = append(queue, nexts[i])
+			}
+		}
+	}
+	return -1
+}
+
+func getNexts(p []byte) []string {
+	var place int
+	for i := 0; i < 6; i++ {
+		if p[i] == '0' {
+			place = i
+			break
+		}
+	}
+	switch place {
+	case 0:
+		return []string{swaps(p, 0, 1), swaps(p, 0, 3)}
+	case 1:
+		return []string{swaps(p, 1, 0), swaps(p, 1, 2), swaps(p, 1, 4)}
+	case 2:
+		return []string{swaps(p, 2, 1), swaps(p, 2, 5)}
+	case 3:
+		return []string{swaps(p, 3, 0), swaps(p, 3, 4)}
+	case 4:
+		return []string{swaps(p, 4, 3), swaps(p, 4, 5), swaps(p, 4, 1)}
+	default:
+		return []string{swaps(p, 5, 4), swaps(p, 5, 2)}
+	}
+}
+func swaps(tmp []byte, i, j int) string {
+	tmp[i], tmp[j] = tmp[j], tmp[i]
+	res := string(tmp)
+	tmp[i], tmp[j] = tmp[j], tmp[i]
+	return res
+}
+
+func openLock(deadends []string, target string) int {
+	var queue []string
+	var visted [10000]int
+	for _, deadend := range deadends {
+		i, _ := strconv.Atoi(deadend)
+		visted[i] = -1
+	}
+	if visted[0] == 0 {
+		queue = append(queue, "0000")
+	}
+	for len(queue) > 0 {
+		tmp := queue[0]
+		queue = queue[1:]
+
+		before, _ := strconv.Atoi(tmp)
+		if tmp == target {
+			return visted[before]
+		}
+		for i := 0; i < len(tmp); i++ {
+			var next1, next2 byte
+			if tmp[i] == '9' {
+				next1 = 0
+			} else {
+				next1 = tmp[i] + 1 - '0'
+			}
+			if tmp[i] == '0' {
+				next2 = 9
+			} else {
+				next2 = tmp[i] - 1 - '0'
+			}
+			nexts1 := tmp[:i] + strconv.Itoa(int(next1)) + tmp[i+1:]
+			nexts2 := tmp[:i] + strconv.Itoa(int(next2)) + tmp[i+1:]
+			i1, _ := strconv.Atoi(nexts1)
+			i2, _ := strconv.Atoi(nexts2)
+			if visted[i1] == 0 {
+				visted[i1] = visted[before] + 1
+				queue = append(queue, nexts1)
+			}
+			if visted[i2] == 0 {
+				visted[i2] = visted[before] + 1
+				queue = append(queue, nexts2)
+			}
+		}
+	}
+	return -1
+}
+
 type ThroneInheritance struct {
 	kingName string
 	nodes    map[string][]string
@@ -60,11 +246,9 @@ func preOder(name string, nodes map[string][]string, res *[]string) {
 		*res = append(*res, name)
 	}
 	for _, son := range nodes[name] {
-		preOder(son,nodes,res)
+		preOder(son, nodes, res)
 	}
 }
-
-
 
 func maxLength(arr []string) int {
 	ans := 0
@@ -604,4 +788,7 @@ func maxUncrossedLines(nums1 []int, nums2 []int) int {
 }
 
 func main() {
+
+	snakesAndLadders([][]int{
+		{1, 1, -1}, {1, 1, 1}, {-1, 1, 1}})
 }
