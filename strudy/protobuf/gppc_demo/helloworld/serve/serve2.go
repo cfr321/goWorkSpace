@@ -56,7 +56,6 @@ func newServer(wordSize int) *server2 {
 	}
 }
 func main() {
-
 	conn, _ := net.Listen("tcp", ":9090")
 	s := grpc.NewServer()
 	pb.RegisterSynaCtrlServer(s, newServer(4))

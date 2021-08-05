@@ -25,8 +25,298 @@ type Employee struct {
 //			l = m + 1
 //		}
 //	}
-//	return l
+//	return ls
 //}
+
+func eventualSafeNodes(graph [][]int) (res []int) {
+
+	color := make([]int, len(graph))
+	var safe func(int) bool
+	safe = func(x int) bool {
+		if color[x] > 0 {
+			return color[x] == 2
+		}
+		color[x] = 1
+		for i := 0; i < len(graph[x]); i++ {
+			if !safe(graph[x][i]) {
+				return false
+			}
+		}
+		color[x] = 2
+		return true
+	}
+	for i := 0; i < len(graph); i++ {
+		if safe(i) {
+			res = append(res, i)
+		}
+	}
+	return
+}
+
+
+func findUnsortedSubarray(nums []int) int {
+	tmp := make([]int, len(nums))
+	copy(tmp, nums)
+	sort.Ints(nums)
+	i := 0
+	for ; i < len(nums); i++ {
+		if tmp[i] != nums[i] {
+			break
+		}
+	}
+	j := len(nums) - 1
+	for ; j > i; j-- {
+		if tmp[j] != nums[j] {
+			break
+		}
+	}
+	return j - i + 1
+}
+func findUnsortedSubarray2(nums []int) int {
+	l, r := -1, -1
+	maxn := math.MinInt32
+	minn := math.MaxInt32
+	n := len(nums)
+	for i := 0; i < n; i++ {
+		if maxn < nums[i] {
+			maxn = nums[i]
+		} else {
+			r = i
+		}
+		if minn > nums[n-i-1] {
+			minn = nums[n-i-1]
+		} else {
+			l = n - i - 1
+		}
+	}
+	if r == -1 {
+		return 0
+	}
+	return r - l + 1
+}
+func networkDelayTime(times [][]int, n int, k int) int {
+	G := make([][]int, n)
+	for i := 0; i < n; i++ {
+		G[i] = make([]int, n)
+		for h := 0; h < n; h++ {
+			G[i][h] = math.MaxInt32
+		}
+	}
+	for i := 0; i < len(times); i++ {
+		G[times[i][0]-1][times[i][1]-1] = times[i][2]
+	}
+	dist := make([]int, n)
+	vis := make([]bool, n)
+	for i := 0; i < n; i++ {
+		dist[i] = math.MaxInt32
+	}
+	dist[k-1] = 0
+	for i := 0; i < n-1; i++ {
+		m := math.MaxInt32
+		t := 0
+		for j := 0; j < n; j++ {
+			if dist[j] < m && !vis[j] {
+				m = dist[j]
+				t = j
+			}
+		}
+		if m == math.MaxInt32 {
+			break
+		}
+		vis[t] = true
+		for j := 0; j < n; j++ {
+			if G[t][j] != 0 && G[t][j]+m < dist[j] {
+				dist[j] = G[t][j] + m
+			}
+		}
+	}
+	res := 0
+	for i := 0; i < n; i++ {
+		if dist[i] > res {
+			res = dist[i]
+		}
+	}
+	if res == math.MaxInt32 {
+		return -1
+	}
+	return res
+}
+
+type node struct {
+	row, col, val int
+}
+
+var nodes []node
+
+func verticalTraversal(root *TreeNode) (res [][]int) {
+	nodes = []node{}
+	nodes = append(nodes, node{0, 0, root.Val})
+	dfs987(root, 0, 0)
+	sort.Slice(nodes, func(i, j int) bool {
+		if nodes[i].col == nodes[i].col && nodes[i].row == nodes[j].row {
+			return nodes[i].val < nodes[j].val
+		}
+		if nodes[i].col == nodes[j].col {
+			return nodes[i].row < nodes[j].row
+		}
+		return nodes[i].col < nodes[j].col
+	})
+	res = append(res, []int{nodes[0].val})
+	for i := 1; i < len(nodes); i++ {
+		if nodes[i].col != nodes[i-1].col {
+			res = append(res, []int{nodes[i].val})
+		} else {
+			res[len(res)-1] = append(res[len(res)-1], nodes[i].val)
+		}
+	}
+
+	return
+}
+func dfs987(root *TreeNode, row, col int) {
+	if root.Left != nil {
+		nodes = append(nodes, node{row + 1, col - 1, root.Left.Val})
+		dfs987(root.Left, row+1, col-1)
+	}
+
+	if root.Right != nil {
+		nodes = append(nodes, node{row + 1, col + 1, root.Right.Val})
+		dfs987(root.Right, row+1, col+1)
+	}
+}
+
+var res863 []int
+
+func distanceK(root *TreeNode, target *TreeNode, k int) []int {
+	res863 = []int{}
+
+	do863(root, target, k)
+	return res863
+}
+
+func do863(root *TreeNode, target *TreeNode, k int) int {
+	if root == nil {
+		return 0
+	}
+	if root == target {
+		dfs863(root, 0, k)
+		return 1
+	} else {
+		r := do863(root.Right, target, k)
+		if r > 0 {
+			if r == k {
+				res863 = append(res863, root.Val)
+				return 0
+			}
+			if r < k {
+				dfs863(root.Left, r+1, k)
+			}
+			return r + 1
+		} else {
+			l := do863(root.Left, target, k)
+			if l > 0 {
+				if l == k {
+					res863 = append(res863, root.Val)
+					return 0
+				}
+				if l < k {
+					dfs863(root.Right, l+1, k)
+				}
+				return l + 1
+			}
+		}
+	}
+	return 0
+}
+
+func dfs863(root *TreeNode, tmp int, tar int) {
+	if root == nil {
+		return
+	}
+	if tmp == tar {
+		res863 = append(res863, root.Val)
+		return
+	} else {
+		dfs863(root.Left, tmp+1, tar)
+		dfs863(root.Right, tmp+1, tar)
+	}
+}
+func maximumTime(time string) string {
+	tmp := []byte(time)
+	if tmp[0] == '?' {
+		if tmp[1] == '?' || tmp[1] < '4' {
+			tmp[0] = '2'
+		} else {
+			tmp[0] = '1'
+		}
+	}
+	if tmp[1] == '?' {
+		if tmp[0] == '2' {
+			tmp[1] = '3'
+		} else {
+			tmp[1] = '9'
+		}
+	}
+	if tmp[3] == '?' {
+		tmp[3] = '5'
+	}
+	if tmp[4] == '?' {
+		tmp[4] = '9'
+	}
+	return string(tmp)
+}
+
+func groupAnagrams(strs []string) [][]string {
+	rem := make(map[string]int)
+	var ans [][]string
+	for i := 0; i < len(strs); i++ {
+		s := stringsort(strs[i])
+		if p, ok := rem[s]; ok {
+			ans[p] = append(ans[p], strs[i])
+		} else {
+			tmp := []string{strs[i]}
+			ans = append(ans, tmp)
+			rem[s] = len(ans) - 1
+		}
+	}
+	return ans
+}
+
+func stringsort(s string) string {
+	var nums [26]int
+	for i := 0; i < len(s); i++ {
+		nums[s[i]-'a']++
+	}
+	var res []byte
+	for i := 0; i < 26; i++ {
+		for j := 0; j < nums[i]; j++ {
+			res = append(res, byte(i+'a'))
+		}
+	}
+	return string(res)
+
+	//t := []byte(s)
+	//sort.Slice(t, func(i, j int) bool {
+	//	return t[i] < t[j]
+	//})
+	//return string(t)
+}
+func maximumElementAfterDecrementingAndRearranging(arr []int) int {
+	rem := make([]int, len(arr)+1)
+	num := 0
+	for i := 0; i < len(arr); i++ {
+		if arr[i] <= len(arr) {
+			rem[arr[i]]++
+		} else {
+			num++
+		}
+	}
+	ans := 0
+	for i := 1; i <= len(arr); i++ {
+		ans = min(i, ans+rem[i])
+	}
+	ans += num
+	return ans
+}
 
 func numWays(n int, relation [][]int, k int) int {
 	path := make([][]int, 10)
@@ -46,7 +336,7 @@ func dfsnumWays(path [][]int, tk int, tn int, k int, n int, ans *int) {
 		return
 	}
 	for i := 0; i < len(path[tn]); i++ {
-		dfsnumWays(path,tk+1,path[tn][i],k,n,ans)
+		dfsnumWays(path, tk+1, path[tn][i], k, n, ans)
 	}
 }
 func convertToTitle(columnNumber int) string {
@@ -180,7 +470,6 @@ func openLock(deadends []string, target string) int {
 	for len(queue) > 0 {
 		tmp := queue[0]
 		queue = queue[1:]
-
 		before, _ := strconv.Atoi(tmp)
 		if tmp == target {
 			return visted[before]
@@ -240,6 +529,18 @@ var deathed map[string]struct{}
 //	preOder(this.kingName, this.nodes, &res)
 //	return res
 //}
+
+func isCovered(ranges [][]int, left int, right int) bool {
+	sort.Slice(ranges, func(i, j int) bool {
+		return ranges[i][0] < ranges[j][0]
+	})
+	for i := 0; i < len(ranges); i++ {
+		if ranges[i][0] <= left && ranges[i][1] >= left {
+			left = ranges[i][1]
+		}
+	}
+	return left >= right
+}
 
 func preOder(name string, nodes map[string][]string, res *[]string) {
 	if _, ok := deathed[name]; !ok {

@@ -32,7 +32,6 @@ func main() {
 				return
 			}
 		}
-
 		c.String(200, fmt.Sprintf("upload ok %d files", len(files)))
 		c.FileAttachment("./data/data.csv", "data.csv")
 	})
