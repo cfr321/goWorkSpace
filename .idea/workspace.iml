@@ -3,8 +3,9 @@
   <component name="Go" enabled="true" />
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$/../../../../Users/摇井/OneDrive/桌面/git/rosedb" />
-    <content url="file://$MODULE_DIR$/../swelldb" />
     <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$/../swelldb" />
+    <content url="file://$MODULE_DIR$/../syncserver" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
