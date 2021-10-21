@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"math"
 	"math/bits"
 	"reflect"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 // Definition for Employee.
@@ -13,6 +15,223 @@ type Employee struct {
 	Id           int
 	Importance   int
 	Subordinates []int
+}
+
+func fib(n int) int {
+	const M int = 1e9 + 7
+	if n < 2 {
+		return n
+	}
+	fn1, fn2 := 0, 1
+	for i := 1; i < n; i++ {
+		fn1, fn2 = fn2, (fn2+fn1)%M
+	}
+	return fn2
+}
+
+//func addBinary(a string, b string) string {
+//	strconv.ParseInt(a,b)
+//}
+
+func numDecodings(s string) int {
+	if s == "0" {
+		return 0
+	}
+	MAX := int(1e9 + 7)
+	dp := make([]int, len(s)+1)
+	dp[0] = 1
+	if s[0] == '*' {
+		dp[1] = 9
+	} else {
+		dp[1] = 1
+	}
+	for i := 1; i < len(s); i++ {
+		be := s[i-1]
+		if s[i] == '*' {
+			dp[i+1] = (9 * dp[i]) % MAX
+			if be == '1' {
+				dp[i+1] = (dp[i+1] + dp[i-1]*9) % MAX
+			}
+			if be == '2' {
+				dp[i+1] = (dp[i+1] + dp[i-1]*6) % MAX
+			}
+			if be == '*' {
+				dp[i+1] = (dp[i+1] + dp[i-1]*15) % MAX
+			}
+		} else if s[i] == '0' {
+			if be == '*' {
+				dp[i+1] = 2 * dp[i-1] % MAX
+			} else if be == '1' || be == '2' {
+				dp[i+1] = dp[i-1]
+			} else {
+				return 0
+			}
+		} else {
+			dp[i+1] = dp[i]
+			if be <= '6' {
+				if be == '*' {
+					dp[i+1] = (dp[i+1] + 2*dp[i-1]) % MAX
+				}
+				if be == '1' || be == '2' {
+					dp[i+1] = (dp[i+1] + dp[i-1]) % MAX
+				}
+			} else {
+				if be == '*' || be == '1' {
+					dp[i+1] = (dp[i+1] + dp[i-1]) % MAX
+				}
+			}
+		}
+	}
+	fmt.Println(dp)
+	return dp[len(s)]
+}
+
+func divide(a int, b int) int {
+	var flag int
+	if a^b > 0 {
+		flag = 1
+	} else {
+		flag = -1
+	}
+	a = abs(a)
+	b = abs(b)
+	res := 0
+
+	for a > 0 {
+		shirt := 0
+		for (b << shirt) <= a {
+			shirt++
+		}
+		a -= b << (shirt - 1)
+		res += 1 << (shirt - 1)
+	}
+	return res * flag
+}
+func abs(a int) int {
+	if a >= 0 {
+		return a
+	}
+	return -a
+}
+
+func fullJustify(words []string, maxWidth int) []string {
+	var res []string
+	wl := len(words[0])
+	start := 0
+	for i := 1; i < len(words); i++ {
+		if wl+len(words[i])+i-start <= maxWidth {
+			wl += len(words[i])
+		} else {
+			res = append(res, buildLine(wl, words[start:i], maxWidth))
+			wl = len(words[i])
+			start = i
+		}
+	}
+	var line string
+	for i := start; i < len(words); i++ {
+		line += words[i]
+		if i != len(words)-1 {
+			line += " "
+		}
+	}
+	line += strings.Repeat(" ", maxWidth-len(line))
+	res = append(res, line)
+	return res
+}
+
+func buildLine(wl int, words []string, maxWidth int) string {
+	wn := len(words)
+	if wn == 1 {
+		return words[0] + strings.Repeat(" ", maxWidth-len(words[0]))
+	}
+	var line string
+	p := (maxWidth - wl) / (wn - 1)
+	less := maxWidth - wl - p*(wn-1)
+	gap := strings.Repeat(" ", p)
+	for i := 0; i < wn; i++ {
+		line += words[i]
+		if i != wn-1 {
+			line += gap
+			if less > 0 {
+				line += " "
+				less--
+			}
+		}
+	}
+	return line
+}
+
+func smallestK(arr []int, k int) []int {
+	if k == 0 {
+		return []int{}
+	}
+	l, r := 0, len(arr)-1
+	for l < r {
+		p := patition(arr, l, r)
+		if p == k {
+			return arr[:k]
+		} else if p > k {
+			r = p - 1
+		} else {
+			k = p + 1
+		}
+	}
+	return arr
+}
+
+func patition(arr []int, l, r int) int {
+	p := arr[l]
+	for l < r {
+		for r > l && arr[r] >= p {
+			r--
+		}
+		arr[l] = arr[r]
+		for l < r && arr[l] <= p {
+			l++
+		}
+		arr[r] = arr[l]
+	}
+	arr[l] = p
+	return p
+}
+
+func patition2(arr []int, l, r int) (int, int) {
+	p := arr[l]
+	i := l + 1
+	for i <= r {
+		if arr[i] > p {
+			arr[i], arr[r] = arr[r], arr[i]
+			r--
+		} else if arr[i] < p {
+			arr[i], arr[l] = arr[l], arr[i]
+			i++
+			l++
+		} else {
+			i++
+		}
+	}
+	return l, r
+}
+
+func compress(chars []byte) int {
+	num := 0
+	t := 0
+	for i := 0; i < len(chars); i++ {
+		num++
+		if i == len(chars)-1 || chars[i] != chars[i+1] {
+			chars[t] = chars[i]
+			t++
+			if num > 1 {
+				tmp := strconv.Itoa(num)
+				for n := 0; n < len(tmp); n++ {
+					chars[t] = tmp[n]
+					t++
+				}
+			}
+			num = 0
+		}
+	}
+	return t
 }
 
 //func firstBadVersion(n int) int {
@@ -52,7 +271,6 @@ func eventualSafeNodes(graph [][]int) (res []int) {
 	}
 	return
 }
-
 
 func findUnsortedSubarray(nums []int) int {
 	tmp := make([]int, len(nums))
@@ -331,7 +549,7 @@ func numWays(n int, relation [][]int, k int) int {
 func dfsnumWays(path [][]int, tk int, tn int, k int, n int, ans *int) {
 	if tk == k {
 		if tn == n {
-			*ans ++
+			*ans++
 		}
 		return
 	}
@@ -1090,6 +1308,5 @@ func maxUncrossedLines(nums1 []int, nums2 []int) int {
 
 func main() {
 
-	snakesAndLadders([][]int{
-		{1, 1, -1}, {1, 1, 1}, {-1, 1, 1}})
+	numDecodings("1*72*")
 }

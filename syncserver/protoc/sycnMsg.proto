@@ -1,0 +1,14 @@
+syntax = "proto3";
+package protoc;
+option go_package = "/protoc";
+
+service SyncServer{
+  rpc SyncCtl(Res) returns (Resp){}
+}
+message Res{
+  uint32 rank = 1;
+  uint32 epoch = 2;
+}
+message Resp{
+  bool sync = 1;
+}

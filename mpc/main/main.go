@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/cfr321/mpc"
+	"github.com/chenfar/mpc"
+
 	"os"
 	"sync"
 )
@@ -18,7 +19,7 @@ func main() {
 				os.Exit(1)
 			}
 			mpc.Barrier()
-			data := 0.5
+			data := 100.0
 			reduce := mpc.AllReduceFloat(data)
 			fmt.Println(reduce)
 			group.Done()

@@ -1,8 +1,6 @@
 package mpc
 
-import (
-	"github.com/cfr321/mpc/comm"
-)
+import "github.com/chenfar/mpc/comm"
 
 type MpiError string
 
