@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	_ "net/http/pprof"
 	"runtime"
-	"time"
+	"strconv"
 )
 
 func readMemStats() {
@@ -15,6 +17,15 @@ func readMemStats() {
 	runtime.ReadMemStats(&ms)
 
 	log.Printf(" ===> Alloc:%d(bytes) HeapIdle:%d(bytes) HeapReleased:%d(bytes)", ms.Alloc, ms.HeapIdle, ms.HeapReleased)
+}
+
+type result struct {
+	Message string `json:"message"`
+	Status  int    `json:"status"`
+}
+
+func (r result) String() string {
+	return "{\nmessage:" + r.Message + ",\n" + "status:" + strconv.Itoa(r.Status) + ",\n}"
 }
 
 func test1() {
@@ -32,31 +43,16 @@ func test1() {
 	log.Println(" ===> loop end.")
 }
 
+func health() {
+	go http.Get("http://192.168.221.1:12345/health")
+	resp, err := http.Get("http://192.168.221.2:12346/health")
+	if err != nil {
+		fmt.Errorf("%v", err)
+	}
+	defer resp.Body.Close()
+	all, err := ioutil.ReadAll(resp.Body)
+	fmt.Println(string(all))
+}
 func main() {
-
-	//启动pprof
-	go func() {
-		log.Println(http.ListenAndServe("0.0.0.0:10000", nil))
-	}()
-
-	log.Println(" ===> [Start].")
-
-	readMemStats()
-	test1()
-	readMemStats()
-
-	log.Println(" ===> [force gc].")
-	runtime.GC() //强制调用gc回收
-
-	log.Println(" ===> [Done].")
-	readMemStats()
-
-	go func() {
-		for {
-			readMemStats()
-			time.Sleep(10 * time.Second)
-		}
-	}()
-
-	time.Sleep(3600 * time.Second) //睡眠，保持程序不退出
+	health()
 }

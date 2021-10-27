@@ -17,6 +17,58 @@ type Employee struct {
 	Subordinates []int
 }
 
+func nextGreaterElement(nums1 []int, nums2 []int) []int {
+	rem := make(map[int]int)
+	var stack []int
+	for _, num := range nums2 {
+		for len(stack) != 0 && stack[len(stack)-1] < num {
+			rem[stack[len(stack)-1]] = num
+			stack = stack[:len(stack)-1]
+		}
+		stack = append(stack, num)
+	}
+	var res []int
+	for i := 0; i < len(nums1); i++ {
+		if v, ok := rem[nums1[i]]; ok {
+			res = append(res, v)
+		} else {
+			res = append(res, -1)
+		}
+
+	}
+	return res
+}
+
+func shoppingOffers(price []int, special [][]int, needs []int) int {
+	n := len(price)
+	dp := make(map[string]int)
+	var dfs func(need []byte) int
+	dfs = func(need []byte) (minPrice int) {
+		if res, ok := dp[string(need)]; ok {
+			return res
+		}
+		for i, p := range price {
+			minPrice += int(need[i]) * p // 不购买任何大礼包，原价购买购物清单中的所有物品
+		}
+		next := make([]byte, n)
+	out:
+		for _, s := range special {
+			for i, nd := range need {
+				if int(nd) < s[i] {
+					continue out
+				}
+				next[i] = need[i] - byte(s[i])
+			}
+			minPrice = min(minPrice, dfs(next))
+		}
+		return
+	}
+	need := make([]byte, n)
+	for i, nd := range needs {
+		need[i] = byte(nd)
+	}
+	return dfs(need)
+}
 func fib(n int) int {
 	const M int = 1e9 + 7
 	if n < 2 {
