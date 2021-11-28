@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../rosedb/.idea/rosedb.iml" filepath="$PROJECT_DIR$/../rosedb/.idea/rosedb.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../6.824/src/.idea/src.iml" filepath="$PROJECT_DIR$/../6.824/src/.idea/src.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/workspace.iml" filepath="$PROJECT_DIR$/.idea/workspace.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../go/zpan/.idea/zpan.iml" filepath="$PROJECT_DIR$/../go/zpan/.idea/zpan.iml" />
     </modules>
   </component>
 </project>

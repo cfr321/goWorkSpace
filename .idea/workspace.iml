@@ -2,11 +2,14 @@
 <module type="WEB_MODULE" version="4">
   <component name="Go" enabled="true" />
   <component name="NewModuleRootManager">
-    <content url="file://$MODULE_DIR$/../../../../Users/摇井/OneDrive/桌面/git/rosedb" />
     <content url="file://$MODULE_DIR$" />
     <content url="file://$MODULE_DIR$/../swelldb" />
     <content url="file://$MODULE_DIR$/../syncserver" />
+    <content url="file://$USER_HOME$/Users/摇井/OneDrive/桌面/git/rosedb" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="zpan" />
+    <orderEntry type="module" module-name="rosedb" />
+    <orderEntry type="module" module-name="src" />
   </component>
 </module>

@@ -1,4 +1,8 @@
-package 剑指offer
+package main
+
+import (
+	"sort"
+)
 
 func abs(a int) int {
 	if a >= 0 {
@@ -123,4 +127,113 @@ func twoSum(numbers []int, target int) []int {
 		}
 	}
 	return []int{l, r}
+}
+
+// 07 三数之和，定1求2
+func threeSum(nums []int) [][]int {
+	sort.Ints(nums)
+	res := make([][]int, 0)
+	for i := 0; i < len(nums)-2; i++ {
+		if nums[i] > 0 {
+			break
+		}
+		if i > 0 && nums[i] == nums[i-1] {
+			continue
+		}
+		l, r := i+1, len(nums)-1
+		for l < r {
+			tmp := nums[l] + nums[r] + nums[i]
+			if tmp == 0 {
+				res = append(res, []int{nums[i], nums[l], nums[r]})
+				l++
+				r--
+				for l < r && nums[l] == nums[l-1] {
+					l++
+				}
+				for l < r && nums[r] == nums[r+1] {
+					r--
+				}
+			} else if tmp > 0 {
+				r--
+			} else {
+				l++
+			}
+		}
+	}
+	return res
+}
+
+// 08 最短子数组
+func minSubArrayLen(target int, nums []int) int {
+	l, r := 0, 0
+	sum := 0
+	res := len(nums) + 1
+	for r < len(nums) {
+		sum += nums[r]
+		r++
+		for sum >= target {
+			res = min(res, r-l+1)
+			sum -= nums[l]
+			l++
+		}
+	}
+	if res == len(nums)+1 {
+		return 0
+	}
+	return res
+}
+
+// 09
+func numSubarrayProductLessThanK(nums []int, k int) int {
+	l := 0
+	res := 0
+	tmp := 1
+	for r, num := range nums {
+		tmp *= num
+		for tmp >= k {
+			tmp /= nums[l]
+			l++
+		}
+		res += r - l + 1
+	}
+	return res
+}
+
+// 10
+func subarraySum(nums []int, k int) int {
+	rem := make(map[int]int)
+	rem[0] = 1
+	sum := 0
+	res := 0
+	for i := 0; i < len(nums); i++ {
+		sum += nums[i]
+		res += rem[sum-k]
+		rem[sum]++
+	}
+	return res
+}
+
+// 11
+func findMaxLength(nums []int) int {
+	tmp := 0
+	res := 0
+	rem := make(map[int]int)
+	rem[0] = -1
+	for i := 0; i < len(nums); i++ {
+		if nums[i] == 1 {
+			tmp++
+		} else {
+			tmp--
+		}
+		if k, has := rem[tmp]; has {
+			res = max(res, i-k)
+		} else {
+			rem[tmp] = i
+		}
+	}
+	return res
+}
+
+func main() {
+	threeSum([]int{-1, 0, 1, 2, -1, -4})
 }

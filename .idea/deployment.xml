@@ -5,14 +5,14 @@
       <paths name="node11">
         <serverdata>
           <mappings>
-            <mapping deploy="/FZU/cfr/syncserver" local="$PROJECT_DIR$/syncserver" web="/" />
+            <mapping deploy="/FZU/cfr/goWorkSpace" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
       <paths name="node3">
         <serverdata>
           <mappings>
-            <mapping deploy="/cfr/syncserver" local="$PROJECT_DIR$/syncserver" web="/" />
+            <mapping deploy="/cfr/goWorkSpace" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>

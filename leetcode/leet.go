@@ -17,6 +17,150 @@ type Employee struct {
 	Subordinates []int
 }
 
+func isRectangleCover(rectangles [][]int) bool {
+	area := 0
+	MAX := 100005
+	MIN := -100005
+	a1, b1, a2, b2 := MAX, MAX, MIN, MIN
+	set := make(map[string]int)
+	for _, rectangle := range rectangles {
+		x1, y1, x2, y2 := rectangle[0], rectangle[1], rectangle[2], rectangle[3]
+		area += (x2 - x1) * (y2 - y1)
+		if x1 < a1 || y1 < b1 {
+			a1 = x1
+			b1 = y1
+		}
+		if x2 > a2 || y2 > b2 {
+			a2 = x2
+			b2 = y2
+		}
+		// 记录每个顶点出现的次数
+		record(set, x1, y1)
+		record(set, x1, y2)
+		record(set, x2, y1)
+		record(set, x2, y2)
+	}
+	total := (a2 - a1) * (b2 - b1)
+	if total != area {
+		return false
+	}
+	return len(set) == 4 && has(set, a1, b1) && has(set, a1, b2) && has(set, a2, b1) && has(set, a2, b2)
+
+}
+
+func has(set map[string]int, a int, b int) bool {
+	key := strconv.Itoa(a) + "-" + strconv.Itoa(b)
+	_, ok := set[key]
+	return ok
+}
+
+func record(set map[string]int, x1 int, y1 int) {
+	key := strconv.Itoa(x1) + "-" + strconv.Itoa(y1)
+	set[key]++
+	if set[key]%2 == 0 {
+		delete(set, key)
+	}
+}
+
+func kInversePairs(n int, k int) int {
+	dp := make([][]int, n)
+	for i := 0; i < len(dp); i++ {
+		dp[i] = make([]int, k+1)
+	}
+	mod := int(1e9 + 7)
+	dp[0][0] = 1
+	for i := 1; i < n; i++ {
+		dp[i][0] = 1
+		for j := 1; j <= k; j++ {
+			if j-i-1 >= 0 {
+				dp[i][j] -= dp[i-1][j-i-1]
+			}
+			dp[i][j] = dp[i][j-1] + dp[i-1][j]
+			dp[i][j] %= mod
+		}
+	}
+	return dp[n-1][k]
+}
+
+func findMinStep(board string, hand string) int {
+	var rem [26]int
+	Co := "RYBGW"
+	for _, v := range hand {
+		rem[v-'A']++
+	}
+	dp := make(map[string]int)
+
+	var dfs func(string, int) int
+	dfs = func(board string, step int) int {
+		if board == "" {
+			return step
+		}
+		if v, has := dp[board]; has {
+			return v
+		}
+		ans := 6
+		for k, C := range Co {
+			if rem[C-'A'] > 0 {
+				rem[C-'A']--
+				for i := 0; i <= len(board); i++ {
+					ans = min(dfs(inrow(board[0:i]+Co[k:k+1]+board[i:]), step+1), ans)
+				}
+				rem[C-'A']++
+			}
+		}
+		dp[board] = ans
+		return ans
+	}
+	ans := dfs(board, 0)
+	if ans == 6 {
+		return -1
+	}
+	return ans
+}
+
+func inrow(s string) string {
+	if len(s) < 3 {
+		return s
+	}
+	l := 0
+	for l < len(s) {
+		r := l + 1
+		for r < len(s) && s[l] == s[r] {
+			r++
+		}
+		if r-l >= 3 {
+			return inrow(s[0:l] + s[r:])
+		}
+		l = r
+	}
+	return s
+}
+
+func findWords(words []string) []string {
+	ss := []string{"qwertyuiop", "asdfghjkl", "zxcvbnm"}
+	m := make([]int, 26)
+	for i := 0; i < len(ss); i++ {
+		for _, s := range ss[i] {
+			m[s-'a'] = i
+		}
+	}
+	var res []string
+	for _, word := range words {
+		i := 0
+		word = strings.ToLower(word)
+		for _, s := range word {
+
+			if m[s-'a'] != m[word[0]-'a'] {
+				break
+			}
+			i++
+		}
+		if i == len(word) {
+			res = append(res, word)
+		}
+	}
+	return res
+}
 func nextGreaterElement(nums1 []int, nums2 []int) []int {
 	rem := make(map[int]int)
 	var stack []int
@@ -84,6 +228,94 @@ func fib(n int) int {
 //func addBinary(a string, b string) string {
 //	strconv.ParseInt(a,b)
 //}
+func reorderedPowerOf2(n int) bool {
+	tmp := strconv.Itoa(n)
+	nums := []byte(tmp)
+
+	rem := make(map[string]bool)
+	prefix := make(map[string]bool)
+	for i := 0; i < 32; i++ {
+		tmp := strconv.Itoa(1 << i)
+		rem[tmp] = true
+		for i2, _ := range tmp {
+			prefix[tmp[:i2+1]] = true
+		}
+	}
+	var res bool
+	var dfs func([]byte, int, *bool)
+	dfs = func(nums []byte, i int, res *bool) {
+		if i == len(nums)-1 {
+			if rem[string(nums)] {
+				*res = true
+			}
+			return
+		}
+		if !*res {
+			for j := i; j < len(nums); j++ {
+				if i == 0 && nums[j] == 0 {
+					continue
+				}
+
+				nums[i], nums[j] = nums[j], nums[i]
+				if prefix[string(nums[:i+1])] {
+					dfs(nums, i+1, res)
+				}
+				nums[i], nums[j] = nums[j], nums[i]
+			}
+		}
+	}
+	dfs(nums, 0, &res)
+	return res
+}
+
+func removeInvalidParentheses(s string) []string {
+	lremove, rremove := 0, 0
+	for _, i := range s {
+		if i == '(' {
+			lremove++
+		} else if i == ')' {
+			if lremove == 0 {
+				rremove++
+			} else {
+				lremove--
+			}
+		}
+	}
+	res := make(map[string]struct{})
+	helper(s, 0, "", lremove, rremove, 0, 0, &res)
+	var r []string
+	for key, _ := range res {
+		r = append(r, key)
+	}
+	return r
+}
+
+func helper(s string, i int, tmp string, lremove int, rremove int, lcount int, rcout int, res *map[string]struct{}) {
+	if lremove == 0 && rremove == 0 {
+		(*res)[tmp+s[i:]] = struct{}{}
+		return
+	}
+	if s[i] != '(' && s[i] != ')' {
+		helper(s, i+1, tmp+s[i:i+1], lremove, rremove, lcount, rcout, res)
+	} else {
+		if s[i] == '(' && lremove > 0 {
+			helper(s, i+1, tmp, lremove-1, rremove, lcount, rcout, res)
+		}
+		if s[i] == ')' && rremove > 0 {
+			helper(s, i+1, tmp, lremove, rremove-1, lcount, rcout, res)
+		}
+		if lremove+rremove <= len(s)-i-1 {
+			if s[i] == ')' && rcout+1 > lcount {
+				return
+			}
+			if s[i] == ')' {
+				helper(s, i+1, tmp+s[i:i+1], lremove, rremove, lcount, rcout+1, res)
+			} else {
+				helper(s, i+1, tmp+s[i:i+1], lremove, rremove, lcount+1, rcout, res)
+			}
+		}
+	}
+}
 
 func numDecodings(s string) int {
 	if s == "0" {
@@ -1358,7 +1590,118 @@ func maxUncrossedLines(nums1 []int, nums2 []int) int {
 	return dp[len(nums1)][len(nums2)]
 }
 
-func main() {
+func sampleStats(count []int) []float64 {
+	sum := 0
+	n := 0
+	for i, nu := range count {
+		n += nu
+		sum += i * nu
+	}
+	min, max, avg, mid, mos := -1.0, -1.0, float64(sum)/float64(n), -1.0, -1.0
+	one := -1.0
+	two := -1.0
+	num := 0
+	num_m := 0
+	for i := 0; i < 256; i++ {
+		t := float64(i)
+		if count[i] != 0 {
+			num += count[i]
+			if min == -1.0 {
+				min = t
+			}
+			if float64(i) > max {
+				max = t
+			}
+			if num_m < count[i] {
+				mos = t
+				num_m = count[i]
+			}
+		}
+		if n&1 == 0 {
+			if num >= n/2 && one == -1 {
+				one = t
+			}
+			if num >= n/2+1 && two == -1 {
+				two = t
+			}
+		}
+		if n&1 == 1 {
+			if num >= n/2+1 && one == -1 {
+				one = t
+			}
+		}
+	}
+	if n&1 == 1 {
+		mid = one
+	} else {
+		mid = (one + two) / 2
+	}
 
+	return []float64{min, max, avg, mid, mos}
+}
+func buddyStrings(s string, goal string) bool {
+	if len(s) != len(goal) {
+		return false
+	}
+	dnum := 0
+	a, b := -1, -1
+	rem := make([]int, 26)
+	two := false
+	for i := 0; i < len(s); i++ {
+		if !two {
+			rem[s[i]-'a']++
+			if rem[s[i]-'a'] == 2 {
+				two = true
+			}
+		}
+		if s[i] != goal[i] {
+			dnum++
+			if a == -1 {
+				a = i
+			} else if b == -1 {
+				b = i
+			}
+		}
+	}
+	if dnum == 2 {
+		return s[a] == goal[b] && s[b] == goal[a]
+	}
+	if dnum == 0 {
+		return two
+	}
+	return false
+}
+
+func findAnagrams(s string, p string) []int {
+	var mask [26]int
+	n := len(p)
+	for i := 0; i < n; i++ {
+		mask[p[i]-'a']++
+	}
+	gap := n
+	var ans []int
+	for i := 0; i < len(s); i++ {
+		mask[s[i]-'a']--
+		if mask[s[i]-'a'] >= 0 {
+			gap--
+		} else {
+			gap++
+		}
+		if gap == 0 {
+			ans = append(ans, i-n+1)
+		}
+		if i >= n-1 {
+			mask[s[i-n+1]-'a']++
+			if mask[s[i-n+1]-'a'] > 0 {
+				gap++
+			} else {
+				gap--
+			}
+		}
+	}
+	return ans
+}
+
+func main() {
 	numDecodings("1*72*")
 }
