@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteTargetsManager">
+    <targets>
+      <target name="pcl002@192.168.221.1:22" type="ssh/sftp" uuid="9a54d47f-f355-4a9d-b48e-c35b267e88bd">
+        <config>
+          <option name="projectRootOnTarget" value="/home/pcl002/cfr/goWorkspace" />
+          <option name="serverName" value="pcl002@192.168.221.1:22 password" />
+        </config>
+        <ContributedStateBase type="GoLanguageRuntime">
+          <config>
+            <option name="goPath" value="/home/pcl002/cfr/gopath" />
+            <option name="goRoot" value="/home/pcl002/cfr/sdk/go1.17.4/bin/go" />
+          </config>
+        </ContributedStateBase>
+      </target>
+    </targets>
+  </component>
+</project>

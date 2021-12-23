@@ -8,4 +8,9 @@
   <component name="JavaScriptSettings">
     <option name="languageLevel" value="ES6" />
   </component>
+  <component name="com.itcodebox.notebooks.projectservice.ProjectUIState">
+    <option name="selectedNotebookId" value="1" />
+    <option name="selectedChapterId" value="1" />
+    <option name="selectedNoteId" value="2" />
+  </component>
 </project>

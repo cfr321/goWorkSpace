@@ -1702,6 +1702,182 @@ func findAnagrams(s string, p string) []int {
 	return ans
 }
 
+type node2 struct {
+	a, b int
+	c    float64
+}
+
+func kthSmallestPrimeFraction(arr []int, k int) []int {
+	var ns []float32
+	rem := make(map[float32][]int)
+	for i := 0; i < len(arr)-1; i++ {
+		for j := 1; j < len(arr); j++ {
+			f := float32(arr[i]) / float32(arr[j])
+			ns = append(ns, f)
+			rem[f] = []int{arr[i], arr[j]}
+		}
+	}
+	kselect(k-1, ns, 0, len(ns)-1)
+	return rem[ns[k-1]]
+}
+
+func kselect(k int, ns []float32, l, r int) {
+	for l < r {
+		p := partition(ns, l, r)
+		if p == k {
+			return
+		} else if p > k {
+			r = p - 1
+		} else {
+			l = p + 1
+		}
+	}
+}
+
+func partition(ns []float32, i, j int) int {
+	x := ns[i]
+	for i < j {
+		for j > i && ns[j] >= x {
+			j--
+		}
+		ns[i] = ns[j]
+		for i < j && ns[i] <= x {
+			i++
+		}
+		ns[j] = ns[i]
+	}
+	ns[i] = x
+	return i
+}
+
+func largestSumAfterKNegations(nums []int, k int) int {
+	sort.Ints(nums)
+	m := 101
+	sum := 0
+	for i := 0; i < len(nums); i++ {
+		if nums[i] < 0 && k > 0 {
+			nums[i] = -nums[i]
+			k--
+		}
+		if nums[i] < m {
+			m = nums[i]
+		}
+		sum += nums[i]
+	}
+	if k > 0 && k%2 == 1 {
+		return sum - 2*m
+	}
+	return sum
+}
+
+type name struct {
+	a       int
+	bdsfadf string
+}
+
+type TopVotedCandidate struct {
+	tops, times []int
+}
+
+func TConstructor(persons, times []int) TopVotedCandidate {
+	tops := make([]int, len(persons))
+	top := -1
+	voteCounts := map[int]int{-1: -1}
+	for i, p := range persons {
+		voteCounts[p]++
+		if voteCounts[p] >= voteCounts[top] {
+			top = p
+		}
+		tops[i] = top
+	}
+	return TopVotedCandidate{tops, times}
+}
+func (c *TopVotedCandidate) Q(t int) int {
+	l, r := 0, len(c.times)
+	t++
+	for l < r {
+		m := (l + r) >> 1
+		if c.times[m] >= t {
+			r = m
+		} else {
+			l = m + 1
+		}
+	}
+	return c.tops[l-1]
+}
+
+func scheduleCourse(courses [][]int) int {
+	sort.Slice(courses, func(i, j int) bool {
+		if courses[i][0] == courses[j][0] {
+			return courses[i][1] < courses[j][1]
+		}
+		return courses[i][0] < courses[j][0]
+	})
+
+	ans := 0
+	last := 0
+	for i := 0; i < len(courses); i++ {
+		if courses[i][1]-courses[i][0] >= last {
+			ans++
+			last += courses[i][0]
+		}
+	}
+	return ans
+}
+
+func loudAndRich(richer [][]int, quiet []int) []int {
+	n := len(quiet)
+	G := make([][]int, n)
+	for _, ints := range richer {
+		G[ints[1]] = append(G[ints[1]], ints[0])
+	}
+	ans := make([]int, n)
+	for i := 0; i < n; i++ {
+		ans[i] = -1
+	}
+	var dfs func(k int)
+	dfs = func(k int) {
+		ans[k] = k
+		for i := 0; i < len(G[k]); i++ {
+			if ans[G[k][i]] == -1 {
+				dfs(G[k][i])
+			}
+			if quiet[ans[k]] > quiet[G[k][i]] {
+				ans[k] = G[k][i]
+			}
+		}
+	}
+	for i := 0; i < n; i++ {
+		if ans[i] == -1 {
+			dfs(i)
+		}
+	}
+	return ans
+}
+
+func longestDupSubstring(s string) string {
+	l, r := 1, len(s)-1
+	var ans string
+	var has bool
+	for l < r {
+		m := (l + r) / 2
+		set := make(map[string]struct{})
+		has = false
+		for i := 0; i <= len(s)-m; i++ {
+			if _, has = set[s[i:i+m]]; has {
+				ans = s[i : i+m]
+				break
+			}
+		}
+		if has {
+			l = m + 1
+		} else {
+			r = m - 1
+		}
+	}
+	return ans
+}
+
 func main() {
-	numDecodings("1*72*")
+
 }

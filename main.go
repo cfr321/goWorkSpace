@@ -5,7 +5,6 @@ import (
 	"crypto/rsa"
 	"flag"
 	"fmt"
-	"net/http"
 	"os"
 	"time"
 	"unsafe"
@@ -28,9 +27,8 @@ func ByteToFloat64(bytes []byte) float64 {
 	return *(*float64)(unsafe.Pointer(&bytes))
 }
 
-
 func main() {
-	http.Get("http://127.0.0.1:8080")
+	fmt.Println("hello")
 }
 
 func chanspeed() {
