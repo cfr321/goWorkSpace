@@ -22,12 +22,7 @@ func longestCommonSubsequence(text1 string, text2 string) int {
 	}
 	return dp[len(text2)]
 }
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
+
 func shipWithinDays(weights []int, D int) int {
 	sum := weights[0]
 	for i := 1; i < len(weights); i++ {

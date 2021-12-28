@@ -2,13 +2,35 @@ package main
 
 import (
 	"fmt"
+	"github.com/labstack/echo/v4"
 	"math"
 	"math/bits"
 	"reflect"
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 )
+
+func max(args ...int) int {
+	ans := args[0]
+	for i := 1; i < len(args); i++ {
+		if args[i] > ans {
+			ans = args[i]
+		}
+	}
+	return ans
+}
+
+func min(args ...int) int {
+	ans := args[0]
+	for i := 1; i < len(args); i++ {
+		if args[i] < ans {
+			ans = args[i]
+		}
+	}
+	return ans
+}
 
 // Definition for Employee.
 type Employee struct {
@@ -1572,10 +1594,12 @@ func topKFrequent(words []string, k int) []string {
 	for i := 0; i < k; i++ {
 		ans = append(ans, strs[i].str)
 	}
+
 	return ans
 }
 
 func maxUncrossedLines(nums1 []int, nums2 []int) int {
+
 	dp := make([][]int, len(nums1)+1)
 	for i := 0; i < len(nums1); i++ {
 		dp[i] = make([]int, len(nums2)+1)
@@ -1790,6 +1814,7 @@ func TConstructor(persons, times []int) TopVotedCandidate {
 		}
 		tops[i] = top
 	}
+
 	return TopVotedCandidate{tops, times}
 }
 func (c *TopVotedCandidate) Q(t int) int {
@@ -1878,6 +1903,71 @@ func longestDupSubstring(s string) string {
 	return ans
 }
 
+func isEvenOddTree(root *TreeNode) bool {
+	q := []*TreeNode{root}
+	for level := 0; len(q) > 0; level++ {
+		prev := 0
+		if level%2 == 1 {
+			prev = math.MaxInt32
+		}
+		size := len(q)
+		for _, node := range q {
+			val := node.Val
+			if val%2 == level%2 || level%2 == 0 && val <= prev || level%2 == 1 && val >= prev {
+				return false
+			}
+			prev = val
+			if node.Left != nil {
+				q = append(q, node.Left)
+			}
+			if node.Right != nil {
+				q = append(q, node.Right)
+			}
+		}
+		q = q[size:]
+	}
+	return true
+}
+
+func getUser(c echo.Context) error {
+	//var u user
+	//id := c.Param("id")
+	//if !bson.IsObjectIdHex(id) {
+	//	return newHTTPError(http.StatusBadRequest, "InvalidID", "invalid user id")
+	//}
+	//err := db.C("user").FindId(bson.ObjectIdHex(id)).One(&u)
+	//if err == mgo.ErrNotFound {
+	//	return newHTTPError(http.StatusNotFound, "NotFound", err.Error())
+	//}
+	//if err != nil {
+	//	return err
+	//}
+	//return c.JSON(http.StatusOK, u)
+	return nil
+}
+
+func numFriendRequests(ages []int) int {
+	rem := make([]int, 125)
+	for i := 0; i < len(ages); i++ {
+		rem[ages[i]]++
+	}
+	for i := 1; i <= 120; i++ {
+		rem[i] += rem[i-1]
+	}
+	ans := 0
+	for i := 15; i <= 120; i++ {
+		if rem[i] != 0 {
+			bound := i/2 + 7
+			ans += (rem[i] - rem[i-1]) * (rem[i] - rem[bound] - 1)
+		}
+	}
+	return ans
+}
+
 func main() {
 
+	wg := sync.WaitGroup{}
+	go func(wg *sync.WaitGroup) {
+		wg.Done()
+	}(&wg)
 }

@@ -30,18 +30,11 @@ func largestRectangleArea(heights []int) int {
 		p := top(stack)
 		stack = append(stack[0 : len(stack)-1])
 		if top(stack) == -1 {
-			with = len(heights) - p +1
+			with = len(heights) - p + 1
 		} else {
 			with = len(heights) - top(stack)
 		}
 		res = max(res, with*heights[p])
 	}
 	return res
-}
-
-func max(res int, i int) int {
-	if res > i {
-		return res
-	}
-	return i
 }
